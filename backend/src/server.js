@@ -15,6 +15,7 @@ import translateRoutes from './routes/translate.routes.js';
 import ocrRoutes from './routes/ocr.routes.js';
 import phraseRoutes from './routes/phrase.routes.js';
 import currencyRoutes from './routes/currency.routes.js';
+import aiRoutes from './routes/ai.routes.js';
 
 dotenv.config();
 
@@ -44,6 +45,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/translate', translateRoutes);
 app.use('/api/ocr', ocrRoutes);
+app.use('/api/ai', aiRoutes);
 app.use('/api/phrases', phraseRoutes);
 app.use('/api/currency', currencyRoutes);
 
