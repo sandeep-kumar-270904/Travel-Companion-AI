@@ -4,26 +4,11 @@ import axios from 'axios';
 export default function TranslationHistory() {
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
-  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filter, setFilter] = useState('all'); // all, favorites
   const [error, setError] = useState('');
 
-  // We assume the user is authenticated and token is available in localstorage
-  // For the sake of this component, if it fails, it means user is not logged in.
   useEffect(() => {
-    const fetchHistory = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        if (!token) {
-          setError('Please log in to view your history.');
-          setLoading(false);
-          return;
-        }
-
-        const res = await axios.get('/api/users/history', {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        setHistory(res.data);
     fetchHistory();
   }, []);
 
