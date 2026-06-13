@@ -65,7 +65,7 @@ export default function VoiceTranslator() {
         throw new Error('No speech detected');
       }
 
-      // 2. Translate text (Auto detect source)
+      // 2. Translate text
       const transRes = await axios.post('/api/translate', {
         text: originalText,
         fromLang: 'auto',
@@ -95,14 +95,17 @@ export default function VoiceTranslator() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-4">Voice-to-Voice Translator</h2>
+    <div className="max-w-3xl mx-auto">
+      <div className="mb-8">
+        <h2 className="text-3xl font-bold text-gray-900 tracking-tight">Voice Translator</h2>
+        <p className="mt-2 text-sm text-gray-500">Real-time speech translation and playback.</p>
+      </div>
       
-      <div className="bg-white rounded-lg shadow p-6 mb-6">
-        <div className="flex items-center gap-4 mb-6">
-          <label className="font-semibold text-gray-700">Translate to:</label>
+      <div className="bg-white shadow-sm ring-1 ring-gray-900/5 sm:rounded-lg mb-8 p-6">
+        <div className="flex items-center gap-4 mb-8">
+          <label className="text-sm font-medium text-gray-700">Translate to:</label>
           <select 
-            className="border p-2 rounded-md flex-grow"
+            className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
             value={toLang}
             onChange={(e) => setToLang(e.target.value)}
           >
@@ -112,42 +115,58 @@ export default function VoiceTranslator() {
           </select>
         </div>
 
-        <div className="flex justify-center">
+        <div className="flex flex-col items-center justify-center py-8">
           <button
             onMouseDown={startRecording}
             onMouseUp={stopRecording}
             onTouchStart={startRecording}
             onTouchEnd={stopRecording}
             disabled={loading}
-            className={`w-32 h-32 rounded-full text-white font-bold text-lg flex items-center justify-center transition-all ${
-              isRecording ? 'bg-red-500 animate-pulse scale-110 shadow-lg' : 'bg-blue-600 hover:bg-blue-700 shadow'
+            className={`w-24 h-24 rounded-full flex items-center justify-center transition-all ${
+              isRecording 
+                ? 'bg-red-100 text-red-600 ring-4 ring-red-500 animate-pulse' 
+                : 'bg-indigo-50 text-indigo-600 hover:bg-indigo-100 ring-1 ring-indigo-500/20 shadow-sm'
             } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
-            {loading ? 'Processing...' : isRecording ? 'Listening...' : 'Hold to Speak'}
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+            </svg>
           </button>
+          <p className="mt-6 text-sm text-gray-500 font-medium">
+            {loading ? 'Processing...' : isRecording ? 'Listening...' : 'Hold to Speak'}
+          </p>
         </div>
-        <p className="text-center text-sm text-gray-500 mt-4">Press and hold the button to record your speech.</p>
       </div>
 
-      <div className="bg-white rounded-lg shadow p-6">
-        <h3 className="text-lg font-semibold mb-4 border-b pb-2">Recent Translations</h3>
-        <div className="space-y-4 max-h-96 overflow-y-auto pr-2">
+      <div className="bg-white shadow-sm ring-1 ring-gray-900/5 sm:rounded-lg overflow-hidden">
+        <div className="px-4 py-5 border-b border-gray-200 sm:px-6">
+          <h3 className="text-lg leading-6 font-medium text-gray-900">Recent Activity</h3>
+        </div>
+        <ul className="divide-y divide-gray-200 max-h-96 overflow-y-auto">
           {history.length === 0 ? (
-            <p className="text-gray-500 text-center">No recent translations</p>
+            <li className="px-4 py-8 text-center text-sm text-gray-500">No recent translations</li>
           ) : (
             history.map((item, i) => (
-              <div key={i} className="border rounded p-3 bg-gray-50">
-                <div className="flex justify-between items-start mb-2">
-                  <p className="text-gray-800 font-medium">{item.originalText}</p>
-                  <span className="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded">
-                    Detected: {item.detectedLang}
-                  </span>
+              <li key={i} className="px-4 py-4 sm:px-6 hover:bg-gray-50">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-medium text-gray-900 truncate">{item.originalText}</p>
+                  <div className="ml-2 flex-shrink-0 flex">
+                    <p className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                      Detected: {item.detectedLang}
+                    </p>
+                  </div>
                 </div>
-                <p className="text-blue-700 font-semibold">{item.translatedText}</p>
-              </div>
+                <div className="mt-2 sm:flex sm:justify-between">
+                  <div className="sm:flex">
+                    <p className="flex items-center text-sm text-indigo-600">
+                      {item.translatedText}
+                    </p>
+                  </div>
+                </div>
+              </li>
             ))
           )}
-        </div>
+        </ul>
       </div>
     </div>
   );

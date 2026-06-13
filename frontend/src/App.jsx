@@ -15,34 +15,67 @@ function App() {
     window.scrollTo(0, 0); // Scroll to top on tab switch
   }, [activeTab]);
 
+  const navItems = [
+    { id: 'home', label: 'Dashboard' },
+    { id: 'ai', label: 'AI Assistant' },
+    { id: 'voice', label: 'Voice Translator' },
+    { id: 'camera', label: 'Camera Translator' },
+    { id: 'history', label: 'History' },
+    { id: 'emergency', label: 'Emergency' },
+    { id: 'phrasebook', label: 'Phrasebook' },
+    { id: 'currency', label: 'Currency' }
+  ];
+
   return (
-    <div className="min-h-screen bg-gray-50 pb-16 md:pb-0 font-sans text-gray-800">
-      <nav className="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-50 border-b border-gray-100">
-        <div className="container mx-auto px-4 py-3 flex space-x-2 overflow-x-auto whitespace-nowrap scrollbar-hide items-center">
-          <div className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 mr-6 pr-6 border-r border-gray-200">
-            TravelAI
+    <div className="min-h-screen bg-[#F9FAFB] font-sans text-gray-900">
+      {/* Top Navbar */}
+      <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16">
+            <div className="flex">
+              <div className="flex-shrink-0 flex items-center">
+                <span className="text-xl font-bold text-slate-900 tracking-tight">TravelAI<span className="text-indigo-600">.</span></span>
+              </div>
+              <div className="hidden sm:-my-px sm:ml-8 sm:flex sm:space-x-8">
+                {navItems.map(tab => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors ${
+                      activeTab === tab.id
+                        ? 'border-indigo-600 text-gray-900'
+                        : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
-          {['home', 'ai', 'voice', 'camera', 'history', 'emergency', 'phrasebook', 'currency'].map(tab => (
-            <button
-              key={tab}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
-                activeTab === tab 
-                  ? 'bg-blue-600 text-white shadow-md transform scale-105' 
-                  : 'text-gray-600 hover:bg-gray-100 hover:text-blue-600'
-              }`}
-              onClick={() => setActiveTab(tab)}
-            >
-              {tab === 'currency' ? 'Currency Converter' 
-                : tab === 'voice' ? 'Voice Translator'
-                : tab === 'camera' ? 'Camera Translator'
-                : tab === 'ai' ? '✨ AI Assistant'
-                : tab.charAt(0).toUpperCase() + tab.slice(1)}
-            </button>
-          ))}
+        </div>
+        {/* Mobile Navigation (Scrollable) */}
+        <div className="sm:hidden border-t border-gray-100 overflow-x-auto scrollbar-hide">
+          <div className="flex space-x-4 px-4 py-3">
+            {navItems.map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`whitespace-nowrap px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                  activeTab === tab.id
+                    ? 'bg-indigo-50 text-indigo-700'
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
         </div>
       </nav>
 
-      <div className="container mx-auto p-4 pt-8 animate-fadeIn">
+      {/* Main Content Area */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fadeIn">
         {activeTab === 'home' && <Home />}
         {activeTab === 'ai' && <AIAssistant />}
         {activeTab === 'voice' && <VoiceTranslator />}
@@ -51,7 +84,7 @@ function App() {
         {activeTab === 'emergency' && <EmergencyPhrases />}
         {activeTab === 'phrasebook' && <Phrasebook />}
         {activeTab === 'currency' && <CurrencyConverterPage />}
-      </div>
+      </main>
     </div>
   );
 }
