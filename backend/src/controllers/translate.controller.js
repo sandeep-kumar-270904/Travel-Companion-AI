@@ -43,3 +43,15 @@ export const textToSpeech = async (req, res, next) => {
     next(error);
   }
 };
+
+export const speechToText = async (req, res, next) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No audio file uploaded' });
+    }
+    const text = await translateService.recognizeSpeech(req.file.buffer);
+    res.json({ text });
+  } catch (error) {
+    next(error);
+  }
+};
