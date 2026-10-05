@@ -6,6 +6,7 @@ const translateSchema = z.object({
   text: z.string().min(1),
   fromLang: z.string().min(2),
   toLang: z.string().min(2),
+  apiKey: z.string().optional(),
 });
 
 const ttsSchema = z.object({
@@ -15,8 +16,8 @@ const ttsSchema = z.object({
 
 export const translateText = async (req, res, next) => {
   try {
-    const { text, fromLang, toLang } = translateSchema.parse(req.body);
-    const result = await translateService.translateText(text, fromLang, toLang);
+    const { text, fromLang, toLang, apiKey } = translateSchema.parse(req.body);
+    const result = await translateService.translateText(text, fromLang, toLang, apiKey);
     
     // Save to history if user is authenticated
     if (req.user) {
@@ -30,6 +31,9 @@ export const translateText = async (req, res, next) => {
 
     res.json(result);
   } catch (error) {
+    if (error.message.includes('API Key')) {
+      return res.status(400).json({ error: error.message });
+    }
     next(error);
   }
 };

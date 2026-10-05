@@ -1,8 +1,7 @@
-
-// import Hi from '/infosys.png';
 import React, { useRef, useEffect, useState } from 'react';
 import Tesseract from 'tesseract.js';
 import axios from 'axios';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const LANGUAGES = [
   { code: 'hi', name: 'Hindi' },
@@ -12,7 +11,6 @@ const LANGUAGES = [
   { code: 'de', name: 'German' },
   { code: 'zh', name: 'Chinese' },
   { code: 'ar', name: 'Arabic' },
-  // Add more as needed
 ];
 
 export default function ARTranslator() {
@@ -20,26 +18,25 @@ export default function ARTranslator() {
   const canvasRef = useRef(null);
   const [ocrText, setOcrText] = useState('');
   const [translatedText, setTranslatedText] = useState('');
-  const [ocrWords, setOcrWords] = useState([]); // OCR words
-  const [translatedWords, setTranslatedWords] = useState([]); // Translated words
+  const [ocrWords, setOcrWords] = useState([]);
+  const [translatedWords, setTranslatedWords] = useState([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [fallbackImg, setFallbackImg] = useState(null);
-  const [toLang, setToLang] = useState('hi');
+  const [toLang, setToLang] = useState('en');
   const [capturedImg, setCapturedImg] = useState(null);
-  const [boxes, setBoxes] = useState([]); // bounding boxes
+  const [boxes, setBoxes] = useState([]);
   const [uploadedImg, setUploadedImg] = useState(null);
 
-  // Start camera feed
   useEffect(() => {
     if (!fallbackImg) {
-      navigator.mediaDevices.getUserMedia({ video: true })
+      navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
         .then(stream => {
           if (videoRef.current) {
             videoRef.current.srcObject = stream;
           }
         })
-        .catch(() => setError('Camera access denied.'));
+        .catch(() => setError('Camera access denied. Please allow permissions.'));
     }
     return () => {
       if (videoRef.current && videoRef.current.srcObject) {
@@ -48,14 +45,12 @@ export default function ARTranslator() {
     };
   }, [fallbackImg]);
 
-  // Removed auto OCR/translation interval. Now OCR/translation only runs on explicit capture or upload.
-  // Handle image or PDF upload and send to backend for OCR
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
     setLoading(true);
     setError('');
-    setUploadedImg(null);
+    setUploadedImg(URL.createObjectURL(file));
     setCapturedImg(null);
     setFallbackImg(null);
     setBoxes([]);
@@ -64,18 +59,17 @@ export default function ARTranslator() {
     try {
       const formData = new FormData();
       formData.append('file', file);
-      // Send to backend OCR endpoint
       const res = await axios.post('/api/ocr/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
-      // For now, just show file info or extracted text
       if (res.data.text) {
         setOcrText(res.data.text);
-        // Optionally, auto-translate
+        const apiKey = localStorage.getItem('gemini_api_key');
         const tRes = await axios.post('/api/translate', {
           text: res.data.text,
           fromLang: 'auto',
           toLang,
+          apiKey
         });
         setTranslatedText(tRes.data.translatedText);
       } else {
@@ -89,7 +83,6 @@ export default function ARTranslator() {
     }
   };
 
-  // Capture a still image from video and run OCR/translation
   const handleCapture = async () => {
     if (!videoRef.current || !canvasRef.current) return;
     const video = videoRef.current;
@@ -108,10 +101,12 @@ export default function ARTranslator() {
       const wordBoxes = (result.data.words || []).map(word => word.bbox);
       setBoxes(wordBoxes);
       if (result.data.text.trim()) {
+        const apiKey = localStorage.getItem('gemini_api_key');
         const res = await axios.post('/api/translate', {
           text: result.data.text,
           fromLang: 'auto',
           toLang,
+          apiKey
         });
         setTranslatedText(res.data.translatedText);
         setTranslatedWords(res.data.translatedText.split(' '));
@@ -126,19 +121,20 @@ export default function ARTranslator() {
     }
   };
 
-  // Fallback: load sample image and run OCR/translation
   const handleFallback = async () => {
-    setFallbackImg('./infosys.png'); // Place a sample image in public folder
+    setFallbackImg('./infosys.png');
     setLoading(true);
     setError('');
     try {
       const { data: { text } } = await Tesseract.recognize('/sample-menu.jpg', 'eng');
       setOcrText(text);
       if (text.trim()) {
+        const apiKey = localStorage.getItem('gemini_api_key');
         const res = await axios.post('/api/translate', {
           text,
           fromLang: 'auto',
           toLang,
+          apiKey
         });
         setTranslatedText(res.data.translatedText);
       } else {
@@ -152,124 +148,141 @@ export default function ARTranslator() {
   };
 
   return (
-    <div className="relative max-w-xl mx-auto mt-10">
-      <h2 className="text-xl font-bold mb-2">AR Translator</h2>
-      {/* Language selection dropdown */}
-      <div className="mb-4 flex items-center gap-2">
-        <label htmlFor="toLang" className="font-semibold">Translate to:</label>
-        <select
-          id="toLang"
-          value={toLang}
-          onChange={e => setToLang(e.target.value)}
-          className="border rounded px-2 py-1"
-        >
-          {LANGUAGES.map(lang => (
-            <option key={lang.code} value={lang.code}>{lang.name}</option>
-          ))}
-        </select>
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="max-w-2xl mx-auto space-y-8"
+    >
+      <div className="text-center mb-8">
+        <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-neon-cyan to-blue-500 mb-2">AR Camera</h1>
+        <p className="text-slate-400">Translate the world around you.</p>
       </div>
-      <div className="relative">
-        {/* Global translation overlay at the top */}
-        {translatedText && (
-          <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-70 text-white px-4 py-2 rounded text-lg z-20">
-            {translatedText}
+
+      <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6 relative overflow-hidden">
+        <div className="flex flex-col sm:flex-row items-center justify-between mb-6 gap-4">
+          <div className="flex items-center gap-3 w-full sm:w-auto">
+            <span className="text-sm font-semibold text-slate-400 uppercase tracking-wider">Target Language:</span>
+            <select
+              value={toLang}
+              onChange={e => setToLang(e.target.value)}
+              className="bg-space-800 border border-white/10 rounded-xl px-4 py-2 text-white focus:outline-none focus:border-neon-cyan transition-colors"
+            >
+              {LANGUAGES.map(lang => (
+                <option key={lang.code} value={lang.code}>{lang.name}</option>
+              ))}
+            </select>
           </div>
-        )}
-        {fallbackImg ? (
-          <img src={fallbackImg} alt="Sample" className="w-full rounded" />
-        ) : uploadedImg ? (
-          <div className="relative w-full">
-            <img src={uploadedImg} alt="Uploaded" className="w-full rounded" />
-            {boxes.map((box, i) => (
-              <div
-                key={i}
-                style={{
-                  position: 'absolute',
-                  left: `${(box.x0 / (canvasRef.current?.width || 1)) * 100}%`,
-                  top: `${(box.y0 / (canvasRef.current?.height || 1)) * 100}%`,
-                  width: `${((box.x1 - box.x0) / (canvasRef.current?.width || 1)) * 100}%`,
-                  height: `${((box.y1 - box.y0) / (canvasRef.current?.height || 1)) * 100}%`,
-                  background: 'rgba(0,0,0,0.7)',
-                  color: '#fff',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '1em',
-                  fontWeight: 600,
-                  pointerEvents: 'none',
-                  zIndex: 30,
-                  border: '2px solid #00ff00',
-                }}
+          
+          <div className="flex gap-2 w-full sm:w-auto">
+            { (capturedImg || uploadedImg || fallbackImg) && (
+              <motion.button 
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => { setCapturedImg(null); setUploadedImg(null); setFallbackImg(null); }} 
+                className="px-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-xl text-sm font-medium transition-colors"
               >
-                {translatedWords[i] || ''}
-              </div>
-            ))}
+                Reset Camera
+              </motion.button>
+            )}
           </div>
-        ) : capturedImg ? (
-          <div className="relative w-full">
-            <img src={capturedImg} alt="Captured" className="w-full rounded" />
-            {boxes.map((box, i) => (
-              <div
-                key={i}
-                style={{
-                  position: 'absolute',
-                  left: `${(box.x0 / (canvasRef.current?.width || 1)) * 100}%`,
-                  top: `${(box.y0 / (canvasRef.current?.height || 1)) * 100}%`,
-                  width: `${((box.x1 - box.x0) / (canvasRef.current?.width || 1)) * 100}%`,
-                  height: `${((box.y1 - box.y0) / (canvasRef.current?.height || 1)) * 100}%`,
-                  border: '2px solid #00ff00',
-                  pointerEvents: 'none',
-                  zIndex: 30,
-                }}
-              />
-            ))}
-          </div>
-        ) : (
-          <video ref={videoRef} autoPlay playsInline className="w-full rounded" />
-        )}
-        <canvas ref={canvasRef} style={{ display: 'none' }} />
-        {/* AR Overlay */}
-        {/* Remove global overlay, now each word is overlaid in its box */}
-        {loading && (
-          <div className="absolute inset-0 flex items-center justify-center z-20">
-            <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-          </div>
-        )}
-        {/* Scan button for manual OCR/translation */}
-        <div className="flex justify-center mt-4">
-          <button
-            onClick={handleCapture}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded shadow disabled:opacity-50"
-            disabled={loading}
-          >
-            {loading ? 'Scanning...' : 'Scan'}
-          </button>
         </div>
-      </div>
-      <div className="mt-4 flex gap-2 items-center">
-        <button onClick={() => { setCapturedImg(null); setUploadedImg(null); }} className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
-          Resume Live
-        </button>
-        <button onClick={handleFallback} className="bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-800">
-          Demo with Sample Image
-        </button>
-        <label className="bg-green-700 text-white px-4 py-2 rounded hover:bg-green-800 cursor-pointer">
-          Upload Image/PDF
-          <input type="file" accept="image/*,application/pdf" onChange={handleFileUpload} className="hidden" />
-        </label>
-      </div>
-      <div className="mt-2 text-sm text-gray-600">
-        {loading
-          ? 'Detecting and translating...'
-          : ocrText && (
-            <>
-              <div>Detected: {ocrText}</div>
-              {translatedText && (
-                <div className="mt-2 text-green-700 font-semibold">Translated: {translatedText}</div>
-              )}
-            </>
+
+        <div className="relative aspect-[3/4] sm:aspect-video bg-black/50 rounded-2xl overflow-hidden border border-white/10 shadow-glass-inset">
+          {error && (
+            <div className="absolute inset-0 flex items-center justify-center bg-space-900/80 z-30">
+              <div className="text-red-400 bg-red-500/10 px-6 py-3 rounded-2xl border border-red-500/20 flex items-center gap-2">
+                <span>⚠️</span> {error}
+              </div>
+            </div>
           )}
+
+          {translatedText && !boxes.length && (
+            <motion.div 
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="absolute top-4 left-4 right-4 bg-space-900/80 backdrop-blur-md text-white px-6 py-4 rounded-2xl text-lg z-20 border border-white/10 shadow-xl"
+            >
+              {translatedText}
+            </motion.div>
+          )}
+
+          {fallbackImg ? (
+            <img src={fallbackImg} alt="Sample" className="w-full h-full object-cover" />
+          ) : uploadedImg ? (
+            <div className="w-full h-full relative">
+              <img src={uploadedImg} alt="Uploaded" className="w-full h-full object-contain" />
+            </div>
+          ) : capturedImg ? (
+            <div className="w-full h-full relative">
+              <img src={capturedImg} alt="Captured" className="w-full h-full object-cover" />
+              {/* Removed buggy individual word boxes, relying on the unified overlay above */}
+            </div>
+          ) : (
+            <video ref={videoRef} autoPlay playsInline className="w-full h-full object-cover" />
+          )}
+          
+          <canvas ref={canvasRef} style={{ display: 'none' }} />
+          
+          <AnimatePresence>
+            {loading && (
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="absolute inset-0 flex items-center justify-center bg-space-900/60 backdrop-blur-sm z-20"
+              >
+                <div className="w-16 h-16 border-4 border-slate-700 border-t-neon-cyan rounded-full animate-spin shadow-glow-cyan"></div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {!capturedImg && !uploadedImg && !fallbackImg && (
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4 z-10">
+              <label className="w-12 h-12 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center cursor-pointer transition-colors border border-white/20">
+                <span className="text-xl">📁</span>
+                <input type="file" accept="image/*,application/pdf" onChange={handleFileUpload} className="hidden" />
+              </label>
+
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={handleCapture}
+                disabled={loading}
+                className="w-20 h-20 bg-gradient-to-r from-neon-cyan to-blue-600 rounded-full flex items-center justify-center shadow-glow-cyan disabled:opacity-50 border-4 border-space-900"
+              >
+                <div className="w-14 h-14 border-2 border-white rounded-full"></div>
+              </motion.button>
+              
+              <button 
+                onClick={handleFallback} 
+                className="w-12 h-12 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center cursor-pointer transition-colors border border-white/20 text-xl"
+                title="Use Demo Image"
+              >
+                🖼️
+              </button>
+            </div>
+          )}
+        </div>
+
+        {ocrText && (
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mt-6 p-6 bg-white/5 border border-white/10 rounded-2xl"
+          >
+            <div className="mb-4">
+              <div className="text-xs text-slate-500 uppercase tracking-wider mb-2 font-semibold">Detected Text</div>
+              <p className="text-slate-300">{ocrText}</p>
+            </div>
+            {translatedText && !boxes.length && (
+              <div>
+                <div className="text-xs text-neon-cyan uppercase tracking-wider mb-2 font-semibold">Translation</div>
+                <p className="text-white text-lg font-medium">{translatedText}</p>
+              </div>
+            )}
+          </motion.div>
+        )}
       </div>
-    </div>
+    </motion.div>
   );
 }

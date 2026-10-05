@@ -16,11 +16,12 @@ import ocrRoutes from './routes/ocr.routes.js';
 import phraseRoutes from './routes/phrase.routes.js';
 import currencyRoutes from './routes/currency.routes.js';
 import aiRoutes from './routes/ai.routes.js';
+import companionRoutes from './routes/companion.routes.js';
 
 dotenv.config();
 
-// Connect to MongoDB
-connectDB();
+// MongoDB is disabled in favor of SQLite
+// connectDB();
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -48,6 +49,7 @@ app.use('/api/ocr', ocrRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/phrases', phraseRoutes);
 app.use('/api/currency', currencyRoutes);
+app.use('/api/companions', companionRoutes);
 
 // Default route
 app.get('/', (req, res) => {

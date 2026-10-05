@@ -7,7 +7,7 @@ const connectDB = async () => {
     logger.info(`MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
     logger.error(`Error: ${error.message}`);
-    process.exit(1);
+    logger.warn('Running without database. Some features like auth and history will fail.');
   }
 };
 

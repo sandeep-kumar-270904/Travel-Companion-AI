@@ -64,22 +64,22 @@ export default function TranslationHistory() {
     <div className="max-w-4xl mx-auto">
       <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-3xl font-bold text-gray-900 tracking-tight">Translation History</h2>
-          <p className="mt-2 text-sm text-gray-500">View and manage your past translations.</p>
+          <h2 className="text-3xl font-bold text-white tracking-tight">Translation History</h2>
+          <p className="mt-2 text-sm text-slate-400">View and manage your past translations.</p>
         </div>
       </div>
 
-      <div className="bg-white shadow-sm ring-1 ring-gray-900/5 sm:rounded-lg overflow-hidden mb-6">
-        <div className="px-4 py-5 sm:p-6 border-b border-gray-200 bg-gray-50 flex flex-col sm:flex-row gap-4">
+      <div className="glass-panel rounded-2xl overflow-hidden mb-6">
+        <div className="px-6 py-5 border-b border-slate-700/50 bg-slate-800/20 flex flex-col sm:flex-row gap-4">
           <input
             type="text"
             placeholder="Search history..."
-            className="flex-1 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+            className="flex-1 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm bg-slate-900/50 border-slate-700 text-slate-200 placeholder-slate-500 rounded-lg transition-all"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
           <select
-            className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md sm:w-auto mt-0"
+            className="block w-full pl-3 pr-10 py-2 text-base focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-lg sm:w-auto bg-slate-900/50 border-slate-700 text-slate-200 transition-all"
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
           >
@@ -89,34 +89,34 @@ export default function TranslationHistory() {
         </div>
 
         {loading ? (
-          <div className="px-4 py-12 text-center text-sm text-gray-500">Loading history...</div>
+          <div className="px-6 py-12 text-center text-sm text-slate-400">Loading history...</div>
         ) : error ? (
-          <div className="px-4 py-12 text-center text-sm text-red-500">{error}</div>
+          <div className="px-6 py-12 text-center text-sm text-red-400">{error}</div>
         ) : (
-          <ul className="divide-y divide-gray-200 max-h-[600px] overflow-y-auto">
+          <ul className="divide-y divide-slate-700/50 max-h-[600px] overflow-y-auto scrollbar-hide bg-slate-900/10">
             {filteredHistory.length === 0 ? (
-              <li className="px-4 py-12 text-center text-sm text-gray-500">No translations found.</li>
+              <li className="px-6 py-12 text-center text-sm text-slate-500">No translations found.</li>
             ) : (
               filteredHistory.map((item) => (
-                <li key={item._id} className="px-4 py-4 sm:px-6 hover:bg-gray-50 transition-colors">
+                <li key={item._id} className="px-6 py-5 hover:bg-slate-800/50 transition-all group">
                   <div className="flex items-center justify-between">
-                    <p className="text-sm font-medium text-gray-900 truncate">{item.originalText}</p>
+                    <p className="text-sm font-medium text-slate-200 truncate">{item.originalText}</p>
                     <div className="ml-2 flex-shrink-0 flex gap-2">
-                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-indigo-100 text-indigo-800 uppercase">
+                      <span className="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/20 uppercase tracking-wider">
                         {item.fromLang} &rarr; {item.toLang}
                       </span>
                     </div>
                   </div>
                   <div className="mt-2 sm:flex sm:justify-between">
                     <div className="sm:flex">
-                      <p className="flex items-center text-sm text-gray-500">
+                      <p className="flex items-center text-sm text-slate-400 font-medium">
                         {item.translatedText}
                       </p>
                     </div>
-                    <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0 gap-4">
+                    <div className="mt-4 flex items-center text-sm text-slate-400 sm:mt-0 gap-4 opacity-50 group-hover:opacity-100 transition-opacity">
                       <button 
                         onClick={() => toggleFavorite(item._id)}
-                        className={`transition-colors ${item.isFavorite ? 'text-yellow-500 hover:text-yellow-600' : 'text-gray-400 hover:text-gray-500'}`}
+                        className={`transition-all p-2 rounded-full hover:bg-slate-700/50 ${item.isFavorite ? 'text-yellow-400 hover:text-yellow-300' : 'text-slate-500 hover:text-slate-300'}`}
                         title="Toggle Favorite"
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -125,7 +125,7 @@ export default function TranslationHistory() {
                       </button>
                       <button 
                         onClick={() => deleteItem(item._id)}
-                        className="text-gray-400 hover:text-red-500 transition-colors"
+                        className="text-slate-500 hover:text-red-400 transition-all p-2 rounded-full hover:bg-slate-700/50"
                         title="Delete"
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

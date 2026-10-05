@@ -11,17 +11,21 @@
     scrollbar-width: none;
   }
   .animate-fadeIn {
-    animation: fadeIn 0.4s ease-out forwards;
+    animation: fadeIn 0.5s ease-out forwards;
+  }
+  .glass-panel {
+    @apply bg-slate-800/40 backdrop-blur-xl border border-slate-700/50 shadow-2xl;
   }
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
+  from { opacity: 0; transform: translateY(15px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
 body {
   margin: 0;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  background-color: #f8fafc;
+  background-color: #0f172a; /* Tailwind slate-900 */
+  color: #f8fafc; /* Tailwind slate-50 */
 }
