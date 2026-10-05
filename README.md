@@ -10,7 +10,18 @@
   <p align="center">
     <strong>An Enterprise-Grade, AI-Powered Travel Assistance Platform</strong>
   </p>
+
+  <p align="center">
+    <a href="https://github.com/sandeep-kumar-270904/sandeep-s-Translator-/actions"><img src="https://img.shields.io/badge/build-passing-brightgreen?style=flat-square" alt="Build Status"></a>
+    <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square" alt="License: MIT"></a>
+    <a href="https://github.com/sandeep-kumar-270904/sandeep-s-Translator-/pulls"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" alt="PRs Welcome"></a>
+    <a href="https://reactjs.org/"><img src="https://img.shields.io/badge/React-18.x-blue?style=flat-square&logo=react" alt="React Version"></a>
+  </p>
 </div>
+
+> **TL;DR:** Travel Companion AI is a production-ready, full-stack application that leverages Large Language Models (Google Gemini 1.5) to provide real-time translation, itinerary generation, and simulated social matchmaking for global travelers. Built with React, Node.js, Express, and SQLite.
+
+---
 
 <details>
 <summary><b>📖 Table of Contents (40 Sections)</b></summary>
