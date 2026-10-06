@@ -81,6 +81,19 @@ Travelers frequently struggle to aggregate information across dozens of apps (ma
 - **Leverage AI:** Utilize Large Language Models (LLMs) for dynamic, context-aware routing, planning, and language support.
 - **Provide Premium UX:** Deliver an ultra-smooth, high-performance interface that minimizes friction.
 
+## 🛠️ Technology Stack
+![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB)
+![NodeJS](https://img.shields.io/badge/node.js-6DA55F?style=for-the-badge&logo=node.js&logoColor=white)
+![Express.js](https://img.shields.io/badge/express.js-%23404d59.svg?style=for-the-badge&logo=express&logoColor=%2361DAFB)
+![TailwindCSS](https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![SQLite](https://img.shields.io/badge/sqlite-%2307405e.svg?style=for-the-badge&logo=sqlite&logoColor=white)
+![Google Gemini](https://img.shields.io/badge/Google%20Gemini-8E75B2?style=for-the-badge&logo=google&logoColor=white)
+
+- **Frontend:** React (Vite), Tailwind CSS, Framer Motion
+- **Backend:** Node.js, Express.js
+- **Database:** SQLite
+- **AI / ML:** Google Gemini 1.5 Pro / Flash APIs
+
 ## 5. Features
 - 🤖 **AI Assistant:** Context-aware travel advice and local emergency mapping.
 - ✨ **AI Itinerary Generator:** Instant 3-day itinerary generation for any global city.
@@ -303,11 +316,15 @@ A: Yes, simply replace the `sqlite3` configurations in `backend/src/config` with
 4. Navigate to **Companions** -> Click **Connect & Chat**.
 
 ## 37. Contributing Guide
+We welcome contributions from the community! Please read our [Code of Conduct](CODE_OF_CONDUCT.md) to keep our community approachable and respectable.
+
 1. Fork the Project
 2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+3. Commit your Changes (`git commit -m 'feat: Add some AmazingFeature'`)
 4. Push to the Branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
+
+*Note: All PRs must pass the automated CI/CD linting workflows before being merged.*
 
 ## 38. License Information
 Distributed under the MIT License. See `LICENSE` for more information.
