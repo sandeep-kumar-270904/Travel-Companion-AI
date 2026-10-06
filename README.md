@@ -23,49 +23,70 @@
 
 ---
 
+## 📖 Table of Contents
+
 <details>
-<summary><b>📖 Table of Contents (40 Sections)</b></summary>
+<summary><b>1️⃣ Product & Vision</b></summary>
 
-- [1. Project Overview](#2-project-overview)
-- [2. Problem Statement](#3-problem-statement)
-- [3. Objectives](#4-objectives)
-- [4. Features](#5-features)
-- [5. Functional Requirements](#6-functional-requirements)
-- [6. Non-Functional Requirements](#7-non-functional-requirements)
-- [7. User Stories](#8-user-stories)
-- [8. Use Cases](#9-use-cases)
-- [9. High-Level Design (HLD)](#10-high-level-design)
-- [10. Low-Level Design (LLD)](#11-low-level-design)
-- [11. System Architecture](#12-system-architecture)
-- [12. Data Flow](#13-data-flow)
-- [13. Database Design](#14-database-design)
-- [14. API Documentation](#15-api-documentation)
-- [15. Authentication Flow](#16-authentication-flow)
-- [16. Machine Learning Pipeline](#17-machine-learning-pipeline)
-- [17. Dataset Documentation](#18-dataset-documentation)
-- [18. Folder Structure](#19-folder-structure)
-- [19. Technology Stack & Justification](#20-technology-stack-with-justification)
-- [20. Installation Guide](#21-installation-guide)
-- [21. Configuration Guide](#22-configuration-guide)
-- [22. Environment Variables](#23-environment-variables)
-- [23. Running Locally](#24-running-locally)
-- [24. Docker Setup](#25-docker-setup)
-- [25. Deployment Guide](#26-deployment-guide)
-- [26. Testing Strategy](#27-testing-strategy)
-- [27. Performance Metrics](#28-performance-metrics)
-- [28. Security Considerations](#29-security-considerations)
-- [29. Scalability Considerations](#30-scalability-considerations)
-- [30. Limitations](#31-limitations)
-- [31. Future Enhancements](#32-future-enhancements)
-- [32. Troubleshooting Guide](#33-troubleshooting-guide)
-- [33. FAQ](#34-faq)
-- [34. Screenshots Section](#35-screenshots-section)
-- [35. Demo Instructions](#36-demo-instructions)
-- [36. Contributing Guide](#37-contributing-guide)
-- [37. License Information](#38-license-information)
-- [38. References](#39-references)
-- [39. Credits](#40-credits)
+- [2. Project Overview](#2-project-overview)
+- [3. Problem Statement](#3-problem-statement)
+- [4. Objectives](#4-objectives)
+- [5. Features](#5-features)
+- [6. Functional Requirements](#6-functional-requirements)
+- [7. Non-Functional Requirements](#7-non-functional-requirements)
+- [8. User Stories](#8-user-stories)
+- [9. Use Cases](#9-use-cases)
+</details>
 
+<details>
+<summary><b>2️⃣ System & Database Architecture</b></summary>
+
+- [10. High-Level Design (HLD)](#10-high-level-design)
+- [11. Low-Level Design (LLD)](#11-low-level-design)
+- [12. System Architecture](#12-system-architecture)
+- [13. Data Flow](#13-data-flow)
+- [14. Database Design](#14-database-design)
+- [15. API Documentation](#15-api-documentation)
+- [16. Authentication Flow](#16-authentication-flow)
+</details>
+
+<details>
+<summary><b>3️⃣ Machine Learning & Technology</b></summary>
+
+- [17. Machine Learning Pipeline](#17-machine-learning-pipeline)
+- [18. Dataset Documentation](#18-dataset-documentation)
+- [19. Folder Structure](#19-folder-structure)
+- [20. Technology Stack & Justification](#20-technology-stack-with-justification)
+</details>
+
+<details>
+<summary><b>4️⃣ Deployment, Testing & Ops</b></summary>
+
+- [21. Installation Guide](#21-installation-guide)
+- [22. Configuration Guide](#22-configuration-guide)
+- [23. Environment Variables](#23-environment-variables)
+- [24. Running Locally](#24-running-locally)
+- [25. Docker Setup](#25-docker-setup)
+- [26. Deployment Guide](#26-deployment-guide)
+- [27. Testing Strategy](#27-testing-strategy)
+- [28. Performance Metrics](#28-performance-metrics)
+- [29. Security Considerations](#29-security-considerations)
+- [30. Scalability Considerations](#30-scalability-considerations)
+- [31. Limitations](#31-limitations)
+- [32. Future Enhancements](#32-future-enhancements)
+- [33. Troubleshooting Guide](#33-troubleshooting-guide)
+</details>
+
+<details>
+<summary><b>5️⃣ Community & Showcase</b></summary>
+
+- [34. FAQ](#34-faq)
+- [35. Screenshots Section](#35-screenshots-section)
+- [36. Demo Instructions](#36-demo-instructions)
+- [37. Contributing Guide](#37-contributing-guide)
+- [38. License Information](#38-license-information)
+- [39. References](#39-references)
+- [40. Credits](#40-credits)
 </details>
 
 ---
