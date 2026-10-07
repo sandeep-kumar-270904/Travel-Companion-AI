@@ -124,3 +124,7 @@ Thumbs.db
 *.db3
 database.sqlite
 backend/data/
+
+# Ignore user uploads
+backend/uploads/*
+!backend/uploads/.gitkeep
