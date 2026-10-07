@@ -8,14 +8,14 @@ const getGenAI = (userApiKey) => {
 
 const executeWithFallback = async (genAI, prompt) => {
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
     const result = await model.generateContent(prompt);
     return result.response.text();
   } catch (error) {
     if (error.status === 503) {
-      console.warn('Gemini 1.5 Flash returned 503. Retrying with gemini-1.5-pro...');
+      console.warn('Gemini 2.5 Flash returned 503. Retrying with gemini-2.5-pro...');
       try {
-        const modelPro = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+        const modelPro = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
         const resultPro = await modelPro.generateContent(prompt);
         return resultPro.response.text();
       } catch (proError) {

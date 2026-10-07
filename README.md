@@ -19,7 +19,7 @@
   </p>
 </div>
 
-> **TL;DR:** Travel Companion AI is a production-ready, full-stack application that leverages Large Language Models (Google Gemini 1.5) to provide voice-assisted translation workflows, itinerary generation, and simulated social matchmaking for global travelers. Built with React, Node.js, Express, and SQLite.
+> **TL;DR:** Travel Companion AI is a production-ready, full-stack application that leverages Large Language Models (Google Gemini 2.5) to provide voice-assisted translation workflows, itinerary generation, and simulated social matchmaking for global travelers. Built with React, Node.js, Express, and SQLite.
 
 ---
 
@@ -113,7 +113,7 @@ Travelers frequently struggle to aggregate information across dozens of apps (ma
 - **Frontend:** React (Vite), Tailwind CSS, Framer Motion
 - **Backend:** Node.js, Express.js
 - **Database:** SQLite
-- **AI / ML:** Google Gemini 1.5 Pro / Flash APIs
+- **AI / ML:** Google Gemini 2.5 Pro / Flash APIs
 
 ## 5. Features
 - 🤖 **AI Assistant:** Context-aware travel advice and local emergency mapping.
@@ -322,7 +322,7 @@ While SQLite is excellent for rapid prototyping and low-to-medium traffic, scali
 
 ## 34. FAQ
 **Q: Do I need to pay for Gemini?**
-A: Google provides a free tier for Gemini 1.5 Flash which is more than sufficient for this application.
+A: Google provides a free tier for Gemini 2.5 Flash which is more than sufficient for this application.
 
 **Q: Can I use PostgreSQL instead?**
 A: Yes, simply replace the `sqlite3` configurations in `backend/src/config` with a driver like `pg` or an ORM like Sequelize/Prisma.

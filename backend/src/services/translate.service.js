@@ -14,7 +14,7 @@ export const translateText = async (text, fromLang, toLang, userApiKey) => {
   }
   
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
     const prompt = `Translate the following text from ${fromLang === 'auto' ? 'its original language' : fromLang} to ${toLang}. Only return the translated text without any quotes or explanations. Text: "${text}"`;
     const result = await model.generateContent(prompt);
     let translated = result.response.text().trim();
@@ -29,8 +29,8 @@ export const translateText = async (text, fromLang, toLang, userApiKey) => {
     };
   } catch (error) {
     if (error.status === 503) {
-      console.warn('Gemini 1.5 Flash returned 503 during translation. Retrying with gemini-1.5-pro...');
-      const modelPro = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+      console.warn('Gemini 2.5 Flash returned 503 during translation. Retrying with gemini-2.5-pro...');
+      const modelPro = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
       const prompt = `Translate the following text from ${fromLang === 'auto' ? 'its original language' : fromLang} to ${toLang}. Only return the translated text without any quotes or explanations. Text: "${text}"`;
       const resultPro = await modelPro.generateContent(prompt);
       let translated = resultPro.response.text().trim();
