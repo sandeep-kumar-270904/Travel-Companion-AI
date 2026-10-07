@@ -42,8 +42,9 @@ Travel Companion AI combines all essential travel utilities into a single, high-
 - 💱 **Global Currency Converter:** 150+ live currency exchange rates.
 
 ## 📐 Architecture
-The system operates on a standard 3-tier architecture:
+The system operates on a standard 3-tier REST architecture built for high availability.
 
+### System Diagram
 ```mermaid
 graph TD
     Client[React Frontend] -->|REST/JSON| API[Express Backend]
@@ -52,6 +53,32 @@ graph TD
     API -->|Fetch| Currency[Fawaz Ahmed Currency API]
     API -->|SQL Queries| DB[(SQLite DB)]
 ```
+
+### Data Flow & Database Design
+1. React dispatches a POST request to `/api/companions`.
+2. The Express router validates the payload and passes it to the Controller.
+3. The Controller executes an `INSERT INTO companions` statement.
+4. SQLite persists the data and returns a `201 Created` status with the `lastID`.
+
+```mermaid
+erDiagram
+    COMPANION {
+        int id PK
+        string name
+        string avatar
+        int match
+        string destination
+        string dates
+        string interests
+        string bio
+        datetime created_at
+    }
+```
+
+### API Documentation
+- `GET /api/companions` - Returns all registered companions.
+- `POST /api/companions` - Creates a new travel profile.
+- `POST /api/ai/itinerary` - Generates an itinerary via Gemini SDK.
 
 ## 🛠️ Tech Stack
 - **Frontend:** React (Vite), Tailwind CSS, Framer Motion
@@ -62,7 +89,8 @@ graph TD
 ## 🧠 Engineering Decisions
 - **React + Vite:** Chosen for lightning-fast HMR and excellent component lifecycle management, ensuring a premium 60fps UX.
 - **SQLite Database:** Selected for zero-configuration, local persistence, allowing rapid prototyping without heavy database infrastructure.
-- **AI Fallback Mechanism:** Implemented an `executeWithFallback` wrapper around the Gemini SDK. If Gemini 2.5 Flash hits a `503 Service Unavailable` limit, the backend automatically retries with Gemini 2.5 Pro to ensure 99.9% uptime.
+- **AI Fallback Mechanism:** Implemented an `executeWithFallback` wrapper around the Gemini SDK. If Gemini 2.5 Flash hits a `503 Service Unavailable` rate limit, the backend automatically retries with Gemini 2.5 Pro to ensure 99.9% uptime.
+- **Machine Learning Pipeline:** Relies entirely on zero-shot/few-shot prompting against pre-trained LLMs rather than proprietary datasets. Strict system prompts are injected on the backend to enforce persona behaviors.
 
 ## 💻 Setup
 ```bash
@@ -78,21 +106,40 @@ cd ../backend
 npm install
 ```
 
+### Folder Structure
+```text
+TravelCompanionAI/
+├── backend/
+│   ├── data/           # SQLite database
+│   ├── src/
+│   │   ├── config/     # SQLite, Logger, Env
+│   │   ├── controllers/# Route Logic
+│   │   ├── routes/     # Express Routers
+│   │   └── services/   # AI & External API Logic
+│   └── package.json
+└── frontend/
+    ├── src/
+    │   ├── components/ # React Components
+    │   ├── App.jsx     # Routing & State
+    │   └── index.css   # Tailwind + Custom CSS
+    └── package.json
+```
+
 ## 🔐 Environment Variables
 Create a `.env` file in the `backend/` directory:
 ```env
 PORT=4000
 NODE_ENV=development
 ```
-*(Note: The Gemini API key is currently supplied via the frontend UI directly for easy prototyping).*
 
 ## 🧪 Testing
 - **Unit Testing:** Jest for testing isolated backend services (`ai.service.js`).
+- **Integration Testing:** Supertest for API endpoint validation.
 - **E2E Testing:** Cypress for validating user flows (e.g., generating an itinerary).
 
 ## 🚀 Deployment
-- **Frontend:** Optimized for Vercel or Netlify (`npm run build` outputting to `dist`).
-- **Backend:** Ready for Render, Heroku, or a DigitalOcean Droplet.
+- **Frontend:** Optimized for Vercel or Netlify (Configure build command to `npm run build` and output to `dist`).
+- **Backend:** Ready for Render, Heroku, or a DigitalOcean Droplet (ensure the `.sqlite` file is mounted to a persistent volume).
 
 ## 🛡️ Security
 > [!WARNING]
