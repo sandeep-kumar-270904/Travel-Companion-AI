@@ -19,7 +19,7 @@
   </p>
 </div>
 
-> **TL;DR:** Travel Companion AI is a production-ready, full-stack application that leverages Large Language Models (Google Gemini 1.5) to provide real-time translation, itinerary generation, and simulated social matchmaking for global travelers. Built with React, Node.js, Express, and SQLite.
+> **TL;DR:** Travel Companion AI is a production-ready, full-stack application that leverages Large Language Models (Google Gemini 1.5) to provide voice-assisted translation workflows, itinerary generation, and simulated social matchmaking for global travelers. Built with React, Node.js, Express, and SQLite.
 
 ---
 
@@ -118,7 +118,7 @@ Travelers frequently struggle to aggregate information across dozens of apps (ma
 ## 5. Features
 - 🤖 **AI Assistant:** Context-aware travel advice and local emergency mapping.
 - ✨ **AI Itinerary Generator:** Instant 3-day itinerary generation for any global city.
-- 🗣️ **Live Voice Translation:** Real-time speech-to-text translation across multiple languages.
+- 🗣️ **Voice-Assisted Translation:** Speech-to-text translation workflow across multiple languages.
 - 🌍 **Local Guide & Landmarks:** Wikipedia and Google Maps integrated masonry grids.
 - 💬 **Travel Companions:** SQLite-backed social matchmaking system featuring AI-simulated companion chats.
 - 💱 **Global Currency Converter:** 150+ live currency exchange rates.
