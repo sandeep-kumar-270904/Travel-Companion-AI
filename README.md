@@ -262,6 +262,9 @@ npm install
 ## 22. Configuration Guide
 Ensure you have a Google Gemini API key to utilize the AI features. The key is supplied via the frontend UI directly (saved in `localStorage`), requiring no rigid backend hardcoding.
 
+> [!WARNING]
+> **BYOK Security Implications:** This "Bring Your Own Key" pattern is excellent for open-source prototyping as it avoids centralized hosting costs. However, storing API keys in browser `localStorage` exposes them to potential Cross-Site Scripting (XSS) attacks. For true production environments, you should migrate the Gemini API key to the backend `.env` file and implement strict IP-based rate-limiting on the AI routes.
+
 ## 23. Environment Variables
 Create a `.env` file in the `backend/` directory:
 ```env
@@ -303,6 +306,7 @@ docker-compose up --build
 - **CORS:** Configured to prevent unauthorized domain access.
 - **Rate Limiting:** `express-rate-limit` prevents API abuse.
 - **Helmet:** Sets secure HTTP headers.
+- **BYOK (Bring Your Own Key):** As noted, the client-side API key storage is a prototype pattern. A production architecture must move the LLM authentication to the backend environment variables.
 
 ## 30. Scalability Considerations
 While SQLite is excellent for rapid prototyping and low-to-medium traffic, scaling to hundreds of thousands of users will require migrating `db.js` back to a distributed database like MongoDB or PostgreSQL using a managed service.
