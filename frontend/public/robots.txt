@@ -1,0 +1,16 @@
+User-agent: *
+# Prevent scrapers from indexing API endpoints and backend routes
+Disallow: /api/
+Disallow: /backend/
+Disallow: /data/
+
+# Prevent indexing of potential private routes
+Disallow: /admin/
+Disallow: /private/
+Disallow: /profile/
+
+# Allow search engines to index the main application pages for SEO
+Allow: /
+
+# Add a crawl delay to prevent aggressive bots from overwhelming the server
+Crawl-delay: 10
