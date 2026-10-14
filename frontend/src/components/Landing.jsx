@@ -3,17 +3,89 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 const featuresData = [
   {
-    id: 'voice',
-    title: 'Real-Time Voice',
-    description: 'Speak naturally. Our ultra-fast translation engine delivers conversational fluency in over 100 languages with emotion context.',
+    id: 'itinerary',
+    title: 'Weather-Aware Itinerary Engine',
+    description: 'Meteorologically conditioned travel planning. Open-Meteo weather forecasts dynamically adapt your schedule to rain or sunshine with 1-click .ics calendar export.',
     useCases: [
-      'Conversing smoothly with local vendors',
-      'Getting directions from passersby',
-      'Making friends in noisy environments'
+      'Scheduling indoor museums on rainy days',
+      'Syncing directly to Apple or Google Calendar',
+      'Geographically sensible walking routes'
     ],
     glowClass: 'hover:border-neon-cyan/50 hover:shadow-[0_0_40px_rgba(0,243,255,0.15)]',
     iconGlowClass: 'group-hover:border-neon-cyan/50 group-hover:shadow-[0_0_30px_rgba(0,243,255,0.3)] bg-neon-cyan/5 text-neon-cyan',
     textHoverClass: 'group-hover:text-neon-cyan',
+    iconSvg: (
+      <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+      </svg>
+    )
+  },
+  {
+    id: 'chefpass',
+    title: 'Bilingual Chef Allergy Pass',
+    description: 'Emergency dietary protection abroad. Generates certified medical notices in 12 native scripts (Japanese, Thai, etc.) with phonetic pronunciation guides.',
+    useCases: [
+      'Warning chefs against cross-contamination',
+      'Detecting secret fish sauces and peanut oils',
+      'Showing emergency dietary cards on mobile'
+    ],
+    glowClass: 'hover:border-rose-400/50 hover:shadow-[0_0_40px_rgba(251,113,133,0.15)]',
+    iconGlowClass: 'group-hover:border-rose-400/50 group-hover:shadow-[0_0_30px_rgba(251,113,133,0.3)] bg-rose-400/5 text-rose-400',
+    textHoverClass: 'group-hover:text-rose-400',
+    iconSvg: (
+      <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+      </svg>
+    )
+  },
+  {
+    id: 'expenses',
+    title: 'Foreign Receipt Ledger',
+    description: 'Automated multi-currency expense tracker. Snap a photo of any foreign bill—Gemini OCR extracts line totals and auto-converts to your home currency in SQLite.',
+    useCases: [
+      'Auto-converting Yen or Baht to USD/EUR',
+      'Tracking daily trip budgets and categories',
+      'Exporting CSV files for expense reimbursement'
+    ],
+    glowClass: 'hover:border-emerald-400/50 hover:shadow-[0_0_40px_rgba(52,211,153,0.15)]',
+    iconGlowClass: 'group-hover:border-emerald-400/50 group-hover:shadow-[0_0_30px_rgba(52,211,153,0.3)] bg-emerald-400/5 text-emerald-400',
+    textHoverClass: 'group-hover:text-emerald-400',
+    iconSvg: (
+      <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z" />
+      </svg>
+    )
+  },
+  {
+    id: 'scams',
+    title: 'Tourist Scam Radar & SOS',
+    description: 'Real-time defense against city tourist traps (Rome, Paris, Bangkok, Tokyo) plus dial-ready 1-tap emergency police, ambulance, and embassy phone numbers.',
+    useCases: [
+      'Recognizing fake tuk-tuk and bracelet scams',
+      'One-tap dialling local emergency dispatch',
+      'Locating nearest consular representation'
+    ],
+    glowClass: 'hover:border-amber-400/50 hover:shadow-[0_0_40px_rgba(251,191,36,0.15)]',
+    iconGlowClass: 'group-hover:border-amber-400/50 group-hover:shadow-[0_0_30px_rgba(251,191,36,0.3)] bg-amber-400/5 text-amber-400',
+    textHoverClass: 'group-hover:text-amber-400',
+    iconSvg: (
+      <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+      </svg>
+    )
+  },
+  {
+    id: 'voice',
+    title: 'Voice-Assisted Translation',
+    description: 'Conversational speech-to-text workflow across multiple languages with simulated offline fallback when internet connectivity drops.',
+    useCases: [
+      'Conversing smoothly with local vendors',
+      'Getting directions from passersby',
+      'Making friends in bustling night markets'
+    ],
+    glowClass: 'hover:border-glowing-purple/50 hover:shadow-[0_0_40px_rgba(181,53,246,0.15)]',
+    iconGlowClass: 'group-hover:border-glowing-purple/50 group-hover:shadow-[0_0_30px_rgba(181,53,246,0.3)] bg-glowing-purple/5 text-glowing-purple',
+    textHoverClass: 'group-hover:text-glowing-purple',
     iconSvg: (
       <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
@@ -21,93 +93,20 @@ const featuresData = [
     )
   },
   {
-    id: 'intelligence',
-    title: 'Intelligence Engine',
-    description: 'More than a dictionary. Get local insights, cultural tips, and dynamic itinerary suggestions powered by advanced models.',
+    id: 'offline',
+    title: 'Offline-First PWA Vault',
+    description: 'Underground and flight mode ready. Saved itineraries, emergency cards, and SQLite expense logs remain fully accessible with zero cellular data.',
     useCases: [
-      'Understanding local tipping customs',
-      'Discovering hidden off-path restaurants',
-      'Navigating complex public transit'
-    ],
-    glowClass: 'hover:border-glowing-purple/50 hover:shadow-[0_0_40px_rgba(181,53,246,0.15)]',
-    iconGlowClass: 'group-hover:border-glowing-purple/50 group-hover:shadow-[0_0_30px_rgba(181,53,246,0.3)] bg-glowing-purple/5 text-glowing-purple',
-    textHoverClass: 'group-hover:text-glowing-purple',
-    iconSvg: (
-      <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-      </svg>
-    )
-  },
-  {
-    id: 'ar',
-    title: 'AR Camera Lens',
-    description: 'Point your camera at menus, street signs, and documents. Watch foreign text magically transform into your native language instantly.',
-    useCases: [
-      'Translating complex foreign menus',
-      'Reading street parking signs instantly',
-      'Understanding museum plaques'
+      'Accessing itineraries deep in Tokyo metro',
+      'Reviewing medical chef passes on flights',
+      'Zero international data roaming anxiety'
     ],
     glowClass: 'hover:border-blue-400/50 hover:shadow-[0_0_40px_rgba(96,165,250,0.15)]',
     iconGlowClass: 'group-hover:border-blue-400/50 group-hover:shadow-[0_0_30px_rgba(96,165,250,0.3)] bg-blue-400/5 text-blue-400',
     textHoverClass: 'group-hover:text-blue-400',
     iconSvg: (
       <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-        <path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-      </svg>
-    )
-  },
-  {
-    id: 'offline',
-    title: 'Offline Resilience',
-    description: 'No signal? No problem. Access essential phrases and local emergency information entirely offline.',
-    useCases: [
-      'Accessing phrases deep in the subway',
-      'Finding emergency numbers anywhere',
-      'Saving data roaming charges'
-    ],
-    glowClass: 'hover:border-emerald-400/50 hover:shadow-[0_0_40px_rgba(52,211,153,0.15)]',
-    iconGlowClass: 'group-hover:border-emerald-400/50 group-hover:shadow-[0_0_30px_rgba(52,211,153,0.3)] bg-emerald-400/5 text-emerald-400',
-    textHoverClass: 'group-hover:text-emerald-400',
-    iconSvg: (
-      <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-    )
-  },
-  {
-    id: 'currency',
-    title: 'Live Currency',
-    description: 'Instantly convert local prices to your home currency with live-updating market rates.',
-    useCases: [
-      'Bartering with confidence at bazaars',
-      'Splitting dinner bills easily',
-      'Tracking daily travel budgets'
-    ],
-    glowClass: 'hover:border-amber-400/50 hover:shadow-[0_0_40px_rgba(251,191,36,0.15)]',
-    iconGlowClass: 'group-hover:border-amber-400/50 group-hover:shadow-[0_0_30px_rgba(251,191,36,0.3)] bg-amber-400/5 text-amber-400',
-    textHoverClass: 'group-hover:text-amber-400',
-    iconSvg: (
-      <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-    )
-  },
-  {
-    id: 'sync',
-    title: 'Secure Cloud Sync',
-    description: 'Your translation history and saved phrases are securely synced across all your devices.',
-    useCases: [
-      'Switching between phone and tablet',
-      'Recovering data if a phone is lost',
-      'Reviewing past translations at the hotel'
-    ],
-    glowClass: 'hover:border-rose-400/50 hover:shadow-[0_0_40px_rgba(251,113,133,0.15)]',
-    iconGlowClass: 'group-hover:border-rose-400/50 group-hover:shadow-[0_0_30px_rgba(251,113,133,0.3)] bg-rose-400/5 text-rose-400',
-    textHoverClass: 'group-hover:text-rose-400',
-    iconSvg: (
-      <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
       </svg>
     )
   }

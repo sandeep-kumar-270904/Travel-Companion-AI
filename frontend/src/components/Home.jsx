@@ -52,7 +52,7 @@ const TiltCard = ({ children, className, glowColor }) => {
   );
 };
 
-export default function Home() {
+export default function Home({ onNavigate }) {
   const [fromText, setFromText] = useState('');
   const [fromLang, setFromLang] = useState('en');
   const [toLang, setToLang] = useState('hi');
@@ -164,9 +164,35 @@ export default function Home() {
       variants={{ visible: { transition: { staggerChildren: 0.15 } } }}
       className="max-w-5xl mx-auto"
     >
-      <motion.div variants={panelVariants} className="mb-10 text-center">
-        <h2 className="font-outfit text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-neon-cyan to-blue-400 tracking-tight mb-3 drop-shadow-sm">Translation Dashboard</h2>
-        <p className="font-inter text-slate-400 text-lg">Fast, accurate text and speech translation powered by AI.</p>
+      <motion.div variants={panelVariants} className="mb-8 text-center">
+        <h2 className="font-outfit text-4xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-neon-cyan via-blue-400 to-glowing-purple tracking-tight mb-2 drop-shadow-sm">
+          Autonomous Travel Concierge
+        </h2>
+        <p className="font-inter text-slate-400 text-sm sm:text-base">
+          Real-time weather routing, emergency dietary passes, multi-currency ledger, and voice translation.
+        </p>
+      </motion.div>
+
+      {/* Autonomous Travel Modules Quick Navigation */}
+      <motion.div variants={panelVariants} className="mb-10 grid grid-cols-2 sm:grid-cols-4 gap-4">
+        {[
+          { label: 'Smart Itinerary', sub: 'Weather + .ICS Sync', icon: '🌦️', tab: 'localguide', color: 'from-purple-500/20 via-space-900 to-space-900', border: 'hover:border-purple-500/50', text: 'text-purple-300' },
+          { label: 'Chef Allergy Pass', sub: '12-Lang Emergency', icon: '📇', tab: 'ai', color: 'from-rose-500/20 via-space-900 to-space-900', border: 'hover:border-rose-500/50', text: 'text-rose-300' },
+          { label: 'Receipt Ledger', sub: 'Multi-Currency OCR', icon: '🧾', tab: 'expenses', color: 'from-emerald-500/20 via-space-900 to-space-900', border: 'hover:border-emerald-500/50', text: 'text-emerald-300' },
+          { label: 'Scam Radar & SOS', sub: 'Tourist Trap Defense', icon: '🚨', tab: 'emergency', color: 'from-amber-500/20 via-space-900 to-space-900', border: 'hover:border-amber-500/50', text: 'text-amber-300' }
+        ].map((item, idx) => (
+          <motion.button
+            key={idx}
+            whileHover={{ y: -5, scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => onNavigate && onNavigate(item.tab)}
+            className={`p-4 rounded-3xl bg-gradient-to-br ${item.color} border border-white/10 ${item.border} text-left transition-all shadow-xl backdrop-blur-xl group cursor-pointer relative overflow-hidden`}
+          >
+            <div className="text-3xl mb-2.5 group-hover:scale-110 transition-transform duration-300">{item.icon}</div>
+            <div className={`font-bold font-outfit text-sm sm:text-base ${item.text}`}>{item.label}</div>
+            <div className="text-[11px] text-slate-400 font-medium mt-0.5">{item.sub}</div>
+          </motion.button>
+        ))}
       </motion.div>
 
       <div className="flex flex-col lg:flex-row gap-8 items-stretch justify-center relative">

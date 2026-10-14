@@ -169,7 +169,7 @@ function App() {
             className="w-full"
           >
             {activeTab === 'landing' && <Landing onEnter={() => setActiveTab('home')} />}
-            {activeTab === 'home' && <Home />}
+            {activeTab === 'home' && <Home onNavigate={setActiveTab} />}
             {activeTab === 'ai' && <AIAssistant />}
             {activeTab === 'expenses' && <ExpenseTracker />}
             {activeTab === 'voice' && <VoiceTranslator />}
