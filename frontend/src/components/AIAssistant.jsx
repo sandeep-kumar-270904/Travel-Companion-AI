@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
+import ChefAllergyPass from './ChefAllergyPass';
 
 export default function AIAssistant() {
   const [activeTab, setActiveTab] = useState('menu');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState('');
+  const [dishes, setDishes] = useState([]);
   const [apiKey, setApiKey] = useState(localStorage.getItem('gemini_api_key') || '');
   const [isSettingsOpen, setIsSettingsOpen] = useState(!localStorage.getItem('gemini_api_key'));
 
@@ -27,11 +29,22 @@ export default function AIAssistant() {
     if (!menuText) return;
     setLoading(true);
     setResult('');
+    setDishes([]);
     try {
-      const res = await axios.post('/api/ai/analyze-text', { text: menuText, context: 'Menu', apiKey });
-      setResult(res.data.analysis);
+      const res = await axios.post('/api/ai/analyze-menu', { text: menuText, apiKey });
+      if (res.data?.dishes && Array.isArray(res.data.dishes)) {
+        setDishes(res.data.dishes);
+      } else {
+        setResult(res.data.analysis || 'Analysis complete.');
+      }
     } catch (err) {
-      setResult('Failed to analyze menu. Did you provide a valid API key?');
+      // Fallback to general analyze-text
+      try {
+        const fallbackRes = await axios.post('/api/ai/analyze-text', { text: menuText, context: 'Menu', apiKey });
+        setResult(fallbackRes.data.analysis);
+      } catch (e2) {
+        setResult('Failed to analyze menu. Please verify your Gemini API key or internet connection.');
+      }
     }
     setLoading(false);
   };
@@ -41,6 +54,7 @@ export default function AIAssistant() {
     if (!foodName || !allergies) return;
     setLoading(true);
     setResult('');
+    setDishes([]);
     try {
       const res = await axios.post('/api/ai/allergy-check', { foodName, allergies, apiKey });
       setResult(res.data.result);
@@ -55,6 +69,7 @@ export default function AIAssistant() {
     if (!destination) return;
     setLoading(true);
     setResult('');
+    setDishes([]);
     try {
       const res = await axios.post('/api/ai/travel-advice', { destination, interest, apiKey });
       setResult(res.data.advice);
@@ -67,6 +82,7 @@ export default function AIAssistant() {
   const tabs = [
     { id: 'menu', label: 'Menu Explainer', icon: '🍽️' },
     { id: 'allergy', label: 'Allergy Check', icon: '🛡️' },
+    { id: 'chefpass', label: 'Chef Allergy Pass', icon: '📇' },
     { id: 'advice', label: 'Cultural Advice', icon: '🗺️' }
   ];
 
@@ -276,9 +292,75 @@ export default function AIAssistant() {
                 </motion.button>
               </motion.form>
             )}
+
+            {activeTab === 'chefpass' && (
+              <motion.div
+                key="chefpass"
+                variants={tabVariants}
+                initial="hidden" animate="visible" exit="exit"
+              >
+                <ChefAllergyPass />
+              </motion.div>
+            )}
           </AnimatePresence>
 
-          {/* Results Area */}
+          {/* Structured Dishes Results Area (For Menu Explainer) */}
+          {dishes && dishes.length > 0 && (
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-10 space-y-4 max-w-3xl mx-auto"
+            >
+              <div className="flex items-center justify-between pb-2 border-b border-white/10">
+                <h3 className="text-lg font-bold text-neon-cyan flex items-center gap-2">
+                  <span>🍽️</span> Identified Dishes ({dishes.length})
+                </h3>
+                <span className="text-xs text-slate-400">Allergen & Flavor Analysis</span>
+              </div>
+              <div className="grid grid-cols-1 gap-4">
+                {dishes.map((dish, idx) => (
+                  <div key={idx} className="bg-space-900/80 border border-white/10 rounded-2xl p-5 shadow-glass-inset">
+                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2 mb-2">
+                      <div>
+                        <h4 className="text-xl font-bold text-white flex items-center gap-2">
+                          {dish.name}
+                          {dish.originalName && (
+                            <span className="text-sm font-medium text-purple-300 font-mono">({dish.originalName})</span>
+                          )}
+                        </h4>
+                        <p className="text-sm text-slate-300 mt-1 leading-relaxed">{dish.description}</p>
+                      </div>
+                      {dish.spiceLevel && (
+                        <span className="inline-flex items-center gap-1 px-3 py-1 bg-orange-500/10 border border-orange-500/20 text-orange-300 text-xs font-semibold rounded-full self-start">
+                          🌶️ {dish.spiceLevel} Spice
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="mt-4 pt-3 border-t border-white/5 flex flex-wrap items-center gap-2">
+                      {dish.flavorProfile && (
+                        <span className="text-xs text-slate-400 bg-white/5 px-2.5 py-1 rounded-lg">
+                          Taste: <strong className="text-slate-200">{dish.flavorProfile}</strong>
+                        </span>
+                      )}
+                      {dish.hiddenAllergens && dish.hiddenAllergens.length > 0 && (
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="text-xs text-rose-400 font-semibold">⚠️ Allergens:</span>
+                          {dish.hiddenAllergens.map((alg, aIdx) => (
+                            <span key={aIdx} className="text-xs bg-rose-500/10 text-rose-300 border border-rose-500/20 px-2 py-0.5 rounded-md font-medium">
+                              {alg}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          )}
+
+          {/* Plain Text Results Area */}
           {result && (
             <motion.div 
               initial={{ opacity: 0, y: 20 }}

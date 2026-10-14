@@ -18,6 +18,9 @@ import currencyRoutes from './routes/currency.routes.js';
 import aiRoutes from './routes/ai.routes.js';
 import companionRoutes from './routes/companion.routes.js';
 
+import expenseRoutes from './routes/expense.routes.js';
+import safetyRoutes from './routes/safety.routes.js';
+
 dotenv.config();
 
 // MongoDB is disabled in favor of SQLite
@@ -50,6 +53,8 @@ app.use('/api/ai', aiRoutes);
 app.use('/api/phrases', phraseRoutes);
 app.use('/api/currency', currencyRoutes);
 app.use('/api/companions', companionRoutes);
+app.use('/api/expenses', expenseRoutes);
+app.use('/api/safety', safetyRoutes);
 
 // Default route
 app.get('/', (req, res) => {

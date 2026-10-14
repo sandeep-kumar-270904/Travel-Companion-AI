@@ -3,52 +3,94 @@ import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const EmergencyPhrases = () => {
+  const [activeMainTab, setActiveMainTab] = useState('scams'); // 'scams' | 'emergency' | 'phrases'
+
+  // Scam Radar State
+  const [scamCity, setScamCity] = useState('rome');
+  const [scams, setScams] = useState([]);
+  const [scamsLoading, setScamsLoading] = useState(false);
+  const [scamSearchInput, setScamSearchInput] = useState('');
+
+  // Emergency SOS State
+  const [emergencyCountry, setEmergencyCountry] = useState('japan');
+  const [emergencyData, setEmergencyData] = useState(null);
+
+  // Phrases State
   const [phrases, setPhrases] = useState({});
   const [selectedCategory, setSelectedCategory] = useState('emergency');
   const [selectedLanguage, setSelectedLanguage] = useState('hindi');
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [playingAudio, setPlayingAudio] = useState(null);
 
-  const categories = Object.keys(phrases).length > 0 ? Object.keys(phrases) : ['emergency', 'travel'];
   const languages = ['english', 'hindi', 'telugu', 'spanish'];
 
-  useEffect(() => {
-    const fetchPhrases = async () => {
-      try {
-        setLoading(true);
-        // Using offline emergency data directly for robustness in emergency situations
-        setPhrases({
-          emergency: [
-            { english: "Call the police!", hindi: "पुलिस को बुलाओ!", telugu: "పోలీసులను పిలవండి!", spanish: "¡Llama a la policía!" },
-            { english: "I need help.", hindi: "मुझे मदद चाहिए।", telugu: "నాకు సహాయం కావాలి.", spanish: "Necesito ayuda." }
-          ],
-          medical: [
-            { english: "Where is the hospital?", hindi: "अस्पताल कहाँ है?", telugu: "ఆసుపత్రి ఎక్కడ ఉంది?", spanish: "¿Dónde está el hospital?" },
-            { english: "I need a doctor.", hindi: "मुझे डॉक्टर की जरूरत है।", telugu: "నాకు డాక్టర్ కావాలి.", spanish: "Necesito un médico." },
-            { english: "It hurts here.", hindi: "यहाँ दर्द हो रहा है।", telugu: "ఇక్కడ నొప్పిగా ఉంది.", spanish: "Me duele aquí." }
-          ],
-          police: [
-            { english: "I have been robbed.", hindi: "मुझे लूट लिया गया है।", telugu: "నన్ను దోచుకున్నారు.", spanish: "Me han robado." },
-            { english: "I lost my passport.", hindi: "मेरा पासपोर्ट खो गया है।", telugu: "నా పాస్‌పోర్ట్ పోయింది.", spanish: "He perdido mi pasaporte." }
-          ],
-          transport: [
-            { english: "Where is the embassy?", hindi: "दूतावास कहाँ है?", telugu: "రాయబార కార్యాలయం ఎక్కడ ఉంది?", spanish: "¿Dónde está la embajada?" },
-            { english: "I am lost.", hindi: "मैं खो गया हूँ।", telugu: "నేను తప్పిపోయాను.", spanish: "Estoy perdido." }
-          ]
-        });
-        setLoading(false);
-      } catch (err) {
-        console.error(err);
-        setLoading(false);
+  // Fetch Scams
+  const fetchScams = async (city) => {
+    try {
+      setScamsLoading(true);
+      const apiKey = localStorage.getItem('gemini_api_key');
+      const res = await axios.get(`/api/safety/scams?city=${encodeURIComponent(city)}&apiKey=${apiKey || ''}`);
+      if (res.data?.success) {
+        setScams(res.data.scams);
       }
-    };
-    fetchPhrases();
+    } catch (err) {
+      console.warn("Failed to fetch scams:", err.message);
+    } finally {
+      setScamsLoading(false);
+    }
+  };
+
+  // Fetch Emergency Numbers
+  const fetchEmergency = async (country) => {
+    try {
+      const res = await axios.get(`/api/safety/emergency?country=${encodeURIComponent(country)}`);
+      if (res.data?.success) {
+        setEmergencyData(res.data.data);
+      }
+    } catch (err) {
+      console.warn("Failed to fetch emergency data:", err.message);
+    }
+  };
+
+  useEffect(() => {
+    fetchScams(scamCity);
+    fetchEmergency(emergencyCountry);
+
+    // Initial Emergency Phrases
+    setPhrases({
+      emergency: [
+        { english: "Call the police immediately!", hindi: "तुरंत पुलिस को बुलाओ!", telugu: "వెంటనే పోలీసులను పిలవండి!", spanish: "¡Llama a la policía de inmediato!" },
+        { english: "I need urgent help.", hindi: "मुझे तत्काल मदद चाहिए।", telugu: "నాకు అత్యవసర సహాయం కావాలి.", spanish: "Necesito ayuda urgente." }
+      ],
+      medical: [
+        { english: "Where is the nearest hospital?", hindi: "निकटतम अस्पताल कहाँ है?", telugu: "సమీప ఆసుపత్రి ఎక్కడ ఉంది?", spanish: "¿Dónde está el hospital más cercano?" },
+        { english: "I need an ambulance.", hindi: "मुझे एम्बुलेंस चाहिए।", telugu: "నాకు అంబులెన్స్ కావాలి.", spanish: "Necesito una ambulancia." },
+        { english: "I am having severe allergic shock.", hindi: "मुझे गंभीर एलर्जी का दौरा पड़ा है।", telugu: "నాకు తీవ్రమైన అలర్జీ వచ్చింది.", spanish: "Tengo un shock alérgico grave." }
+      ],
+      police: [
+        { english: "I have been robbed.", hindi: "मुझे लूट लिया गया है।", telugu: "నన్ను దోచుకున్నారు.", spanish: "Me han robado." },
+        { english: "I lost my passport and wallet.", hindi: "मेरा पासपोर्ट और बटुआ खो गया है।", telugu: "నా పాస్‌పోర్ట్ మరియు వాలెట్ పోయాయి.", spanish: "He perdido mi pasaporte y billetera." }
+      ],
+      transport: [
+        { english: "Where is my embassy located?", hindi: "मेरा दूतावास कहाँ स्थित है?", telugu: "నా రాయబార కార్యాలయం ఎక్కడ ఉంది?", spanish: "¿Dónde está ubicada mi embajada?" },
+        { english: "I am lost, please direct me to the station.", hindi: "मैं खो गया हूँ, कृपया मुझे स्टेशन का रास्ता बताएं।", telugu: "నేను తప్పిపోయాను, దయచేసి స్టేషన్‌కు దారి చూపండి.", spanish: "Estoy perdido, por favor indíqueme cómo llegar a la estación." }
+      ]
+    });
   }, []);
+
+  const handleCitySearch = (e) => {
+    e.preventDefault();
+    if (!scamSearchInput.trim()) return;
+    setScamCity(scamSearchInput.trim());
+    fetchScams(scamSearchInput.trim());
+  };
+
+  const handleCountryChange = (c) => {
+    setEmergencyCountry(c);
+    fetchEmergency(c);
+  };
 
   const playAudio = (phrase) => {
     if (playingAudio) playingAudio.pause();
-
     try {
       if ('speechSynthesis' in window) {
         const utterance = new SpeechSynthesisUtterance(phrase[selectedLanguage]);
@@ -68,161 +110,355 @@ const EmergencyPhrases = () => {
     }
   };
 
-  const [locationStatus, setLocationStatus] = useState('');
-  const handleShareLocation = () => {
-    if (!navigator.geolocation) {
-      setLocationStatus('Geolocation is not supported by your browser');
-      return;
-    }
-    setLocationStatus('Getting location...');
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const { latitude, longitude } = position.coords;
-        const mapLink = `https://www.google.com/maps?q=${latitude},${longitude}`;
-        setLocationStatus(`Location found!`);
-        if (navigator.share) {
-          navigator.share({
-            title: 'Emergency: My Location',
-            text: 'I have an emergency. Here is my current location:',
-            url: mapLink
-          }).catch(console.error);
-        } else {
-          // Fallback to clipboard
-          navigator.clipboard.writeText(`Emergency! My location: ${mapLink}`);
-          setLocationStatus('Link copied to clipboard!');
-        }
-      },
-      (error) => {
-        setLocationStatus('Unable to retrieve your location');
-      }
-    );
-  };
-
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="w-12 h-12 rounded-full border-4 border-slate-700 border-t-red-500 animate-spin"></div>
-      </div>
-    );
-  }
-
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="max-w-4xl mx-auto space-y-8"
-    >
-      <div className="text-center mb-8">
-        <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500 mb-2">Emergency Kit</h1>
-        <p className="text-slate-400">Critical phrases when you need them most.</p>
-      </div>
+    <div className="max-w-6xl mx-auto space-y-8 px-4 py-6">
+      {/* Header */}
+      <div className="text-center max-w-3xl mx-auto mb-8">
+        <h2 className="text-3xl sm:text-4xl font-black font-outfit text-white tracking-tight flex items-center justify-center gap-3">
+          <span className="p-2 bg-rose-500/20 text-rose-400 border border-rose-500/30 rounded-2xl">
+            🚨
+          </span>
+          Travel Safety & Scam Radar
+        </h2>
+        <p className="text-slate-400 text-sm mt-2">
+          Curated scam defense, dial-ready emergency contacts, and multilingual SOS phrases.
+        </p>
 
-      {error && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-orange-500/10 border border-orange-500/20 text-orange-400 p-4 rounded-2xl flex items-center gap-3">
-          <span className="text-xl">⚠️</span> {error}
-        </motion.div>
-      )}
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6">
-          <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">Category</h2>
-          <div className="flex flex-wrap gap-3">
-            {categories.map(cat => (
-              <motion.button
-                key={cat}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setSelectedCategory(cat)}
-                className={`px-5 py-2.5 rounded-xl font-medium transition-all capitalize ${
-                  selectedCategory === cat 
-                    ? 'bg-red-500/20 text-red-400 border border-red-500/50 shadow-[0_0_20px_rgba(239,68,68,0.3)]' 
-                    : 'bg-white/5 text-slate-300 border border-transparent hover:bg-white/10'
-                }`}
-              >
-                {cat}
-              </motion.button>
-            ))}
-          </div>
-        </div>
-
-        <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6">
-          <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">Target Language</h2>
-          <div className="flex flex-wrap gap-3">
-            {languages.map(lang => (
-              <motion.button
-                key={lang}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setSelectedLanguage(lang)}
-                className={`px-5 py-2.5 rounded-xl font-medium transition-all ${
-                  selectedLanguage === lang 
-                    ? 'bg-orange-500/20 text-orange-400 border border-orange-500/50' 
-                    : 'bg-white/5 text-slate-300 border border-transparent hover:bg-white/10'
-                }`}
-              >
-                {lang.charAt(0).toUpperCase() + lang.slice(1)}
-              </motion.button>
-            ))}
+        {/* Tab Controls */}
+        <div className="flex justify-center mt-6">
+          <div className="bg-space-900/80 border border-white/10 p-1.5 rounded-2xl flex gap-1">
+            <button
+              onClick={() => setActiveMainTab('scams')}
+              className={`px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+                activeMainTab === 'scams'
+                  ? 'bg-rose-500 text-white shadow-lg shadow-rose-500/30'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              🚨 Tourist Scam Radar
+            </button>
+            <button
+              onClick={() => setActiveMainTab('emergency')}
+              className={`px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+                activeMainTab === 'emergency'
+                  ? 'bg-rose-500 text-white shadow-lg shadow-rose-500/30'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              📞 1-Tap SOS & Embassies
+            </button>
+            <button
+              onClick={() => setActiveMainTab('phrases')}
+              className={`px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+                activeMainTab === 'phrases'
+                  ? 'bg-rose-500 text-white shadow-lg shadow-rose-500/30'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              🗣️ Audio SOS Phrases
+            </button>
           </div>
         </div>
       </div>
 
-      <div className="flex justify-center mt-4 mb-4">
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={handleShareLocation}
-          className="flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-red-600 to-orange-600 text-white font-bold rounded-2xl shadow-[0_0_30px_rgba(239,68,68,0.4)] border border-red-500 hover:shadow-[0_0_40px_rgba(239,68,68,0.6)] transition-all"
-        >
-          <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
-          Share My Location
-        </motion.button>
-      </div>
-      {locationStatus && (
-        <div className="text-center text-sm text-red-400 font-medium mb-4">{locationStatus}</div>
-      )}
+      {/* TAB 1: Tourist Scam Radar */}
+      {activeMainTab === 'scams' && (
+        <div className="space-y-6">
+          {/* City Selector & Search Bar */}
+          <div className="bg-space-800/80 backdrop-blur-xl border border-white/10 rounded-3xl p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <span className="text-xs font-bold uppercase tracking-wider text-rose-400">Popular Destinations:</span>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {['Rome', 'Paris', 'Bangkok', 'Tokyo', 'Barcelona', 'New York'].map(city => (
+                  <button
+                    key={city}
+                    onClick={() => {
+                      setScamCity(city.toLowerCase());
+                      fetchScams(city.toLowerCase());
+                    }}
+                    className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
+                      scamCity.toLowerCase() === city.toLowerCase()
+                        ? 'bg-rose-500/20 border-rose-500 text-rose-300'
+                        : 'bg-white/5 border-white/10 text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    {city}
+                  </button>
+                ))}
+              </div>
+            </div>
 
-      <motion.div 
-        layout
-        className="bg-white/5 backdrop-blur-xl border border-red-500/20 rounded-3xl p-6 md:p-8 relative overflow-hidden"
-      >
-        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-500 to-orange-500 opacity-50" />
-        
-        <div className="space-y-4">
-          <AnimatePresence mode="popLayout">
-            {phrases[selectedCategory]?.map((phrase, index) => (
-              <motion.div 
-                key={index}
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.2, delay: index * 0.05 }}
-                className="group relative bg-space-800/80 hover:bg-red-500/10 border border-white/5 hover:border-red-500/30 rounded-2xl p-5 transition-all flex justify-between items-center"
+            <form onSubmit={handleCitySearch} className="flex gap-2">
+              <input
+                type="text"
+                placeholder="Search any global city..."
+                value={scamSearchInput}
+                onChange={(e) => setScamSearchInput(e.target.value)}
+                className="bg-space-900 border border-white/10 rounded-xl px-4 py-2 text-white text-sm focus:outline-none focus:border-rose-500"
+              />
+              <button
+                type="submit"
+                className="px-4 py-2 bg-rose-500 hover:bg-rose-600 text-white rounded-xl text-sm font-bold transition-colors"
               >
-                <div className="absolute left-0 top-0 bottom-0 w-1 bg-red-500 opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div className="pl-4">
-                  <p className="text-lg text-slate-400 mb-1">{phrase.english}</p>
-                  <p className="text-2xl font-bold text-white">{phrase[selectedLanguage]}</p>
-                </div>
-                <motion.button 
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  onClick={() => playAudio(phrase)} 
-                  className="w-14 h-14 rounded-full bg-red-500/20 text-red-400 flex items-center justify-center border border-red-500/30 hover:bg-red-500 hover:text-white transition-colors shadow-[0_0_15px_rgba(239,68,68,0.4)] ml-4 flex-shrink-0"
+                Inspect
+              </button>
+            </form>
+          </div>
+
+          {/* Scam Cards Grid */}
+          {scamsLoading ? (
+            <div className="py-16 text-center text-slate-400 animate-pulse">
+              Scanning safety intelligence for {scamCity}...
+            </div>
+          ) : scams.length === 0 ? (
+            <div className="py-16 text-center text-slate-400">
+              No reported high-frequency scams for this city yet.
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {scams.map((scam, idx) => (
+                <div
+                  key={idx}
+                  className="bg-space-800/80 backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-xl flex flex-col justify-between hover:border-rose-500/40 transition-colors"
                 >
-                  <svg className="w-7 h-7 ml-1" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
-                </motion.button>
-              </motion.div>
-            ))}
-          </AnimatePresence>
+                  <div>
+                    <div className="flex items-center justify-between gap-2 mb-3">
+                      <span className="px-2.5 py-1 rounded-md text-[11px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20">
+                        {scam.severity || 'Tourist Trap'}
+                      </span>
+                      <span className="text-xs text-slate-400 truncate max-w-[150px]">
+                        📍 {scam.hotspot}
+                      </span>
+                    </div>
+
+                    <h3 className="text-lg font-bold text-white mb-2 font-outfit">
+                      {scam.title}
+                    </h3>
+                    <p className="text-slate-300 text-sm leading-relaxed mb-4">
+                      {scam.howItWorks}
+                    </p>
+                  </div>
+
+                  <div className="bg-black/40 border border-emerald-500/20 rounded-2xl p-4 mt-2">
+                    <div className="text-[11px] uppercase font-bold text-emerald-400 mb-1 flex items-center gap-1.5">
+                      <span>🛡️</span> Prevention Tactic
+                    </div>
+                    <p className="text-xs text-slate-200 leading-normal">
+                      {scam.avoidance}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
-      </motion.div>
-    </motion.div>
+      )}
+
+      {/* TAB 2: 1-Tap SOS Numbers & Embassies */}
+      {activeMainTab === 'emergency' && (
+        <div className="space-y-6">
+          {/* Country Selection */}
+          <div className="bg-space-800/80 backdrop-blur-xl border border-white/10 rounded-3xl p-6 flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <span className="text-xs font-bold uppercase tracking-wider text-rose-400 block mb-2">
+                Select Your Current Country:
+              </span>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  { id: 'japan', label: '🇯🇵 Japan' },
+                  { id: 'france', label: '🇫🇷 France' },
+                  { id: 'italy', label: '🇮🇹 Italy' },
+                  { id: 'thailand', label: '🇹🇭 Thailand' },
+                  { id: 'spain', label: '🇪🇸 Spain' },
+                  { id: 'united_states', label: '🇺🇸 United States' },
+                  { id: 'india', label: '🇮🇳 India' }
+                ].map(c => (
+                  <button
+                    key={c.id}
+                    onClick={() => handleCountryChange(c.id)}
+                    className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold border transition-all ${
+                      emergencyCountry === c.id
+                        ? 'bg-rose-500/20 border-rose-500 text-rose-300 shadow-[0_0_15px_rgba(244,63,94,0.3)]'
+                        : 'bg-white/5 border-white/10 text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    {c.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {emergencyData && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Emergency Dial Numbers */}
+              <div className="bg-space-800/80 backdrop-blur-xl border border-rose-500/30 rounded-3xl p-6 shadow-2xl">
+                <h3 className="text-xl font-bold font-outfit text-white mb-4 flex items-center gap-2">
+                  <span>🚨</span> Direct Emergency Services ({emergencyData.country})
+                </h3>
+                <p className="text-xs text-slate-400 mb-6">
+                  Tap any number on mobile to dial immediately without typing.
+                </p>
+
+                <div className="space-y-3">
+                  <a
+                    href={`tel:${emergencyData.police}`}
+                    className="flex items-center justify-between p-4 bg-rose-500/10 border border-rose-500/30 hover:bg-rose-500/20 rounded-2xl transition-colors group"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="text-2xl">👮</span>
+                      <div>
+                        <div className="text-white font-bold text-sm">Police (Emergency)</div>
+                        <div className="text-xs text-slate-400">Immediate local police dispatch</div>
+                      </div>
+                    </div>
+                    <span className="text-lg font-black font-mono text-rose-400 group-hover:scale-105 transition-transform">
+                      {emergencyData.police} 📞
+                    </span>
+                  </a>
+
+                  <a
+                    href={`tel:${emergencyData.ambulance}`}
+                    className="flex items-center justify-between p-4 bg-red-500/10 border border-red-500/30 hover:bg-red-500/20 rounded-2xl transition-colors group"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="text-2xl">🚑</span>
+                      <div>
+                        <div className="text-white font-bold text-sm">Ambulance / Paramedics</div>
+                        <div className="text-xs text-slate-400">Medical emergency response</div>
+                      </div>
+                    </div>
+                    <span className="text-lg font-black font-mono text-red-400 group-hover:scale-105 transition-transform">
+                      {emergencyData.ambulance} 📞
+                    </span>
+                  </a>
+
+                  <a
+                    href={`tel:${emergencyData.fire}`}
+                    className="flex items-center justify-between p-4 bg-orange-500/10 border border-orange-500/30 hover:bg-orange-500/20 rounded-2xl transition-colors group"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="text-2xl">🚒</span>
+                      <div>
+                        <div className="text-white font-bold text-sm">Fire Department</div>
+                        <div className="text-xs text-slate-400">Rescue and fire services</div>
+                      </div>
+                    </div>
+                    <span className="text-lg font-black font-mono text-orange-400 group-hover:scale-105 transition-transform">
+                      {emergencyData.fire} 📞
+                    </span>
+                  </a>
+
+                  {emergencyData.touristHelpline && (
+                    <div className="p-4 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <span className="text-2xl">🌐</span>
+                        <div>
+                          <div className="text-white font-bold text-sm">Tourist Helpline</div>
+                          <div className="text-xs text-slate-400">Multilingual consultation</div>
+                        </div>
+                      </div>
+                      <span className="text-sm font-bold font-mono text-neon-cyan">
+                        {emergencyData.touristHelpline}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Embassy Directory */}
+              <div className="bg-space-800/80 backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-xl">
+                <h3 className="text-xl font-bold font-outfit text-white mb-4 flex items-center gap-2">
+                  <span>🏛️</span> Diplomatic Embassies & Consulates
+                </h3>
+                <p className="text-xs text-slate-400 mb-6">
+                  Official consular representation for lost passports and citizen emergencies.
+                </p>
+
+                <div className="space-y-3">
+                  {emergencyData.embassies?.map((emb, idx) => (
+                    <div key={idx} className="p-4 bg-space-900/60 border border-white/5 rounded-2xl flex items-center justify-between">
+                      <div>
+                        <div className="text-white font-bold text-sm">{emb.name}</div>
+                        <div className="text-xs text-slate-400">Citizen consular services</div>
+                      </div>
+                      <a
+                        href={`tel:${emb.phone}`}
+                        className="px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-mono font-bold transition-colors"
+                      >
+                        {emb.phone} 📞
+                      </a>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* TAB 3: Audio SOS Phrases */}
+      {activeMainTab === 'phrases' && (
+        <div className="space-y-6">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-space-800/80 backdrop-blur-xl border border-white/10 p-6 rounded-3xl">
+            {/* Category selection */}
+            <div className="flex flex-wrap gap-2">
+              {['emergency', 'medical', 'police', 'transport'].map(cat => (
+                <button
+                  key={cat}
+                  onClick={() => setSelectedCategory(cat)}
+                  className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold capitalize transition-all ${
+                    selectedCategory === cat
+                      ? 'bg-rose-500 text-white'
+                      : 'bg-white/5 text-slate-400 hover:text-white'
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+
+            {/* Language Selection */}
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold text-slate-400 uppercase">Target Voice:</span>
+              <select
+                value={selectedLanguage}
+                onChange={(e) => setSelectedLanguage(e.target.value)}
+                className="bg-space-900 border border-white/10 text-white rounded-xl px-3 py-1.5 text-xs font-bold capitalize focus:outline-none"
+              >
+                {languages.map(lang => (
+                  <option key={lang} value={lang}>{lang}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {phrases[selectedCategory]?.map((phrase, idx) => (
+              <div
+                key={idx}
+                className="bg-space-800/80 backdrop-blur-xl border border-white/10 rounded-2xl p-5 flex items-center justify-between gap-4"
+              >
+                <div>
+                  <div className="text-white font-bold text-base">{phrase.english}</div>
+                  <div className="text-rose-400 font-semibold text-sm mt-1">
+                    {phrase[selectedLanguage] || phrase.english}
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => playAudio(phrase)}
+                  className="p-3 bg-rose-500/20 hover:bg-rose-500 text-rose-300 hover:text-white rounded-xl transition-all"
+                  title="Speak Aloud"
+                >
+                  🔊
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 

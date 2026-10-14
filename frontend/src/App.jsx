@@ -14,15 +14,28 @@ import CurrencyConverterPage from './components/CurrencyConverter';
 import Landing from './components/Landing';
 import LocalGuide from './components/LocalGuide';
 import TravelCompanions from './components/TravelCompanions';
+import ExpenseTracker from './components/ExpenseTracker';
 
 function App() {
   const [activeTab, setActiveTab] = useState('landing');
+  const [isOnline, setIsOnline] = useState(typeof navigator !== 'undefined' ? navigator.onLine : true);
   const vantaRef = useRef(null);
   const [vantaEffect, setVantaEffect] = useState(null);
 
   useEffect(() => {
     window.scrollTo(0, 0); // Scroll to top on tab switch
   }, [activeTab]);
+
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
 
   useEffect(() => {
     if (!vantaEffect) {
@@ -50,14 +63,15 @@ function App() {
   const navItems = [
     { id: 'home', label: 'Dashboard' },
     { id: 'ai', label: 'AI Assistant' },
+    { id: 'expenses', label: 'Expenses' },
+    { id: 'localguide', label: 'Local Guide' },
+    { id: 'companions', label: 'Companions' },
+    { id: 'emergency', label: 'Safety & SOS' },
     { id: 'voice', label: 'Voice' },
     { id: 'camera', label: 'Camera' },
-    { id: 'history', label: 'History' },
-    { id: 'emergency', label: 'Emergency' },
-    { id: 'phrasebook', label: 'Phrasebook' },
     { id: 'currency', label: 'Currency' },
-    { id: 'localguide', label: 'Local Guide' },
-    { id: 'companions', label: 'Companions' }
+    { id: 'phrasebook', label: 'Phrasebook' },
+    { id: 'history', label: 'History' }
   ];
 
   const pageVariants = {
@@ -72,9 +86,9 @@ function App() {
       {activeTab !== 'landing' && (
       <nav className="sticky top-0 z-50 border-b border-white/5 bg-space-900/40 backdrop-blur-2xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex w-full">
-              <div className="flex-shrink-0 flex items-center mr-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center space-x-6 overflow-hidden flex-1">
+              <div className="flex-shrink-0 flex items-center mr-2">
                 <span className="font-outfit text-2xl font-black tracking-tight text-white flex items-center gap-3">
                   <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-neon-cyan to-glowing-purple shadow-glow-cyan flex items-center justify-center">
                     <span className="w-3 h-3 bg-white rounded-full"></span>
@@ -87,7 +101,7 @@ function App() {
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`relative inline-flex items-center px-4 py-2 text-sm font-medium transition-all duration-300 rounded-xl ${
+                    className={`relative inline-flex items-center px-3.5 py-1.5 text-xs sm:text-sm font-medium transition-all duration-300 rounded-xl whitespace-nowrap ${
                       activeTab === tab.id
                         ? 'text-white bg-white/10 shadow-glass-inset'
                         : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
@@ -103,6 +117,21 @@ function App() {
                     {tab.label}
                   </button>
                 ))}
+              </div>
+            </div>
+
+            {/* Offline/Online Live Status Pill */}
+            <div className="flex-shrink-0 ml-4 flex items-center gap-2">
+              <div 
+                className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${
+                  isOnline 
+                    ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' 
+                    : 'bg-amber-500/20 border-amber-500/40 text-amber-300 animate-pulse'
+                }`}
+                title={isOnline ? 'Online: Live LLM and public APIs connected' : 'Offline Mode: Using local SQLite & cached vault for subways/flights'}
+              >
+                <span className={`w-2 h-2 rounded-full ${isOnline ? 'bg-emerald-400' : 'bg-amber-400'}`} />
+                <span className="hidden md:inline">{isOnline ? 'Online' : 'Offline Vault'}</span>
               </div>
             </div>
           </div>
@@ -142,6 +171,7 @@ function App() {
             {activeTab === 'landing' && <Landing onEnter={() => setActiveTab('home')} />}
             {activeTab === 'home' && <Home />}
             {activeTab === 'ai' && <AIAssistant />}
+            {activeTab === 'expenses' && <ExpenseTracker />}
             {activeTab === 'voice' && <VoiceTranslator />}
             {activeTab === 'camera' && <ARTranslator />}
             {activeTab === 'history' && <TranslationHistory />}

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { exportItineraryToICS } from '../utils/icsExport';
 
 export default function LocalGuide() {
   const [places, setPlaces] = useState([]);
@@ -10,6 +11,8 @@ export default function LocalGuide() {
   
   const [itinerary, setItinerary] = useState(null);
   const [itineraryLoading, setItineraryLoading] = useState(false);
+  const [weather, setWeather] = useState([]);
+  const [isSavedOffline, setIsSavedOffline] = useState(false);
   
   const fetchNearbyPlaces = (lat, lon, locationName = '') => {
     setLoading(true);
@@ -61,6 +64,24 @@ export default function LocalGuide() {
       });
   };
 
+  // Load cached itinerary on mount if offline or returning
+  useEffect(() => {
+    try {
+      const cached = localStorage.getItem('cached_itinerary');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (parsed.itinerary && !itinerary) {
+          setItinerary(parsed.itinerary);
+          setWeather(parsed.weather || []);
+          if (!searchQuery) setSearchQuery(parsed.destination || 'Saved Trip');
+          setIsSavedOffline(true);
+        }
+      }
+    } catch (e) {
+      console.warn("Failed to read cached itinerary", e);
+    }
+  }, []);
+
   const handleGenerateItinerary = async () => {
     if (!searchQuery.trim()) {
       setError('Please search for a city first.');
@@ -68,6 +89,8 @@ export default function LocalGuide() {
     }
     setItineraryLoading(true);
     setItinerary(null);
+    setWeather([]);
+    setIsSavedOffline(false);
     setError('');
     
     try {
@@ -80,6 +103,14 @@ export default function LocalGuide() {
       const data = await response.json();
       if (data.error) throw new Error(data.error);
       setItinerary(data.itinerary);
+      setWeather(data.weather || []);
+      // Persist to local vault for subway/flight offline usage
+      localStorage.setItem('cached_itinerary', JSON.stringify({
+        destination: searchQuery,
+        itinerary: data.itinerary,
+        weather: data.weather || []
+      }));
+      setIsSavedOffline(true);
     } catch (err) {
       console.error(err);
       setError('Failed to generate AI Itinerary. Ensure you have added your Gemini API key in AI Assistant.');
@@ -219,9 +250,68 @@ export default function LocalGuide() {
             exit={{ opacity: 0, y: -20 }}
             className="mb-12 bg-space-800/80 backdrop-blur-xl border border-purple-500/30 rounded-3xl p-8 shadow-[0_0_40px_rgba(168,85,247,0.15)] max-w-4xl mx-auto"
           >
-            <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
-              <span className="text-purple-400">✨</span> Your AI Itinerary for {searchQuery}
-            </h2>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-6 border-b border-white/10">
+              <div>
+                <h2 className="text-2xl font-bold text-white flex items-center gap-3">
+                  <span className="text-purple-400">✨</span> Smart Itinerary for {searchQuery}
+                </h2>
+                {isSavedOffline && (
+                  <span className="inline-flex items-center gap-1.5 mt-2 px-3 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                    Saved to Offline Vault (Available without Internet)
+                  </span>
+                )}
+              </div>
+
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => exportItineraryToICS(searchQuery, itinerary)}
+                  className="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold text-sm rounded-xl shadow-lg shadow-purple-500/25 transition-all duration-300 transform hover:scale-105 active:scale-95"
+                  title="Download .ics file to import directly into Apple Calendar, Google Calendar, or Outlook"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  Export to Calendar (.ics)
+                </button>
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(itinerary);
+                    alert('Itinerary copied to clipboard!');
+                  }}
+                  className="px-3 py-2.5 bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white rounded-xl text-sm border border-white/10 transition-colors"
+                  title="Copy Itinerary"
+                >
+                  📋
+                </button>
+              </div>
+            </div>
+
+            {/* Weather forecast row if available */}
+            {weather && weather.length > 0 && (
+              <div className="mb-6 bg-white/5 border border-white/10 rounded-2xl p-4">
+                <div className="text-xs font-semibold text-purple-300 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                  <span>🌦️</span> Open-Meteo 3-Day Forecast for {searchQuery}
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {weather.map((w, idx) => (
+                    <div key={idx} className="bg-space-900/60 border border-white/5 rounded-xl p-3 flex items-center justify-between">
+                      <div>
+                        <div className="text-xs text-slate-400 font-medium">{w.day} ({w.date})</div>
+                        <div className="text-sm font-bold text-white flex items-center gap-1.5 mt-0.5">
+                          <span>{w.icon}</span> {w.condition}
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-sm font-extrabold text-neon-cyan">{w.maxTemp}° / <span className="text-slate-400 text-xs font-normal">{w.minTemp}°C</span></div>
+                        <div className="text-[11px] text-blue-400 font-medium">💧 {w.rainProb}% rain</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <div className="prose prose-invert prose-teal max-w-none text-slate-300">
               {itinerary.split('\n').map((line, i) => {
                 if (line.startsWith('#')) return <h3 key={i} className="text-xl font-bold text-teal-400 mt-6 mb-2">{line.replace(/#/g, '')}</h3>;

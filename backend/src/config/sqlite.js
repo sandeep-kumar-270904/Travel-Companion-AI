@@ -44,7 +44,20 @@ function initDB() {
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )`);
 
-    // Check if table is empty, if so, seed it
+    db.run(`CREATE TABLE IF NOT EXISTS expenses (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      title TEXT NOT NULL,
+      category TEXT NOT NULL,
+      foreign_amount REAL NOT NULL,
+      foreign_currency TEXT NOT NULL,
+      converted_amount REAL NOT NULL,
+      home_currency TEXT NOT NULL,
+      date TEXT NOT NULL,
+      notes TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`);
+
+    // Check if companions table is empty, if so, seed it
     db.get("SELECT COUNT(*) AS count FROM companions", (err, row) => {
       if (!err && row.count === 0) {
         logger.info("Seeding SQLite DB with initial companions...");
@@ -52,6 +65,18 @@ function initDB() {
         for (const comp of INITIAL_COMPANIONS) {
           stmt.run(comp.name, comp.avatar, comp.match, comp.destination, comp.dates, comp.interests, comp.bio);
         }
+        stmt.finalize();
+      }
+    });
+
+    // Seed initial expenses if empty
+    db.get("SELECT COUNT(*) AS count FROM expenses", (err, row) => {
+      if (!err && row.count === 0) {
+        logger.info("Seeding SQLite DB with initial sample expenses...");
+        const stmt = db.prepare(`INSERT INTO expenses (title, category, foreign_amount, foreign_currency, converted_amount, home_currency, date, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`);
+        stmt.run("Shinjuku Omoide Yokocho Yakitori", "Dining", 4200, "JPY", 28.50, "USD", "2026-10-12", "Dinner with local companion");
+        stmt.run("Narita Skyliner Express Ticket", "Transport", 2570, "JPY", 17.40, "USD", "2026-10-12", "Airport transit to Ueno");
+        stmt.run("TeamLab Planets Admission", "Activities", 3800, "JPY", 25.80, "USD", "2026-10-13", "Immersive digital art museum");
         stmt.finalize();
       }
     });

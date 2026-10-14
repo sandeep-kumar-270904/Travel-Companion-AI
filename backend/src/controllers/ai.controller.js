@@ -41,8 +41,19 @@ export const generateItinerary = async (req, res, next) => {
     if (!destination) {
       return res.status(400).json({ error: 'Destination is required' });
     }
-    const itinerary = await aiService.generateItinerary(destination, days, apiKey);
-    res.json({ itinerary });
+    const result = await aiService.generateItinerary(destination, days, apiKey);
+    res.json({ itinerary: result.itinerary, weather: result.weather || [] });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const analyzeMenu = async (req, res, next) => {
+  try {
+    const { text, apiKey } = req.body;
+    if (!text) return res.status(400).json({ error: 'Menu text is required' });
+    const dishes = await aiService.analyzeMenuStructured(text, apiKey);
+    res.json({ dishes });
   } catch (error) {
     next(error);
   }
