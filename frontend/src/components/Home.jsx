@@ -54,57 +54,14 @@ const QUICK_PHRASES = {
   ],
 };
 
-const TiltCard = ({ children, className, glowColor }) => {
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-
-  // Smooth spring physics for effortless, natural, fluid movement
-  const springX = useSpring(mouseX, { damping: 25, stiffness: 120, mass: 0.4 });
-  const springY = useSpring(mouseY, { damping: 25, stiffness: 120, mass: 0.4 });
-
-  // Rotate smoothly between -4 and 4 degrees with fluid follow-through
-  const rotateX = useTransform(springY, [-200, 200], [4, -4]);
-  const rotateY = useTransform(springX, [-200, 200], [-4, 4]);
-
-  const rectRef = useRef(null);
-
-  function handleMouseEnter(event) {
-    rectRef.current = event.currentTarget.getBoundingClientRect();
-  }
-
-  function handleMouse(event) {
-    if (!rectRef.current) {
-      rectRef.current = event.currentTarget.getBoundingClientRect();
-    }
-    const rect = rectRef.current;
-    mouseX.set(event.clientX - rect.left - rect.width / 2);
-    mouseY.set(event.clientY - rect.top - rect.height / 2);
-  }
-
-  function handleMouseLeave() {
-    rectRef.current = null;
-    mouseX.set(0);
-    mouseY.set(0);
-  }
-
-  return (
-    <motion.div
-      style={{ perspective: 1200 }}
-      className={`flex-1 relative group ${className}`}
-    >
-      <motion.div
-        style={{ rotateX, rotateY }}
-        onMouseEnter={handleMouseEnter}
-        onMouseMove={handleMouse}
-        onMouseLeave={handleMouseLeave}
-        className="w-full h-full flex flex-col glass-panel rounded-3xl overflow-hidden relative border border-white/10 transition-shadow duration-300 smooth-tilt"
-      >
-        <div className={`absolute inset-0 bg-gradient-to-br ${glowColor} opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`} />
-        {children}
-      </motion.div>
-    </motion.div>
-  );
-};
+const GlassCard = ({ children, className, glowColor }) => (
+  <div className={`flex-1 relative group ${className}`}>
+    <div className="w-full h-full flex flex-col glass-panel rounded-3xl overflow-hidden relative border border-white/10 hover:border-white/20 transition-all duration-300 shadow-2xl">
+      <div className={`absolute inset-0 bg-gradient-to-br ${glowColor} opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`} />
+      {children}
+    </div>
+  </div>
+);
 
 export default function Home({ onNavigate }) {
   const [fromText, setFromText] = useState('');
@@ -421,7 +378,7 @@ export default function Home({ onNavigate }) {
         
         {/* Left Side: Input Panel */}
         <motion.div variants={panelVariants} className="flex-1 flex w-full">
-          <TiltCard glowColor="from-neon-cyan/15 to-transparent" className={`w-full transition-all duration-300 ${isInputFocused ? 'shadow-glow-cyan border-neon-cyan/50' : 'hover:border-neon-cyan/30 shadow-2xl'}`}>
+          <GlassCard glowColor="from-neon-cyan/15 to-transparent" className={`w-full transition-all duration-300 ${isInputFocused ? 'shadow-glow-cyan border-neon-cyan/50' : 'hover:border-neon-cyan/30 shadow-2xl'}`}>
             
             {/* Header */}
             <div className="px-6 py-4 border-b border-white/10 bg-space-900/50 flex justify-between items-center relative z-10 backdrop-blur-md">
@@ -540,7 +497,7 @@ export default function Home({ onNavigate }) {
               )}
               {error && <p className="text-xs text-red-400 mt-2">{error}</p>}
             </div>
-          </TiltCard>
+          </GlassCard>
         </motion.div>
 
         {/* Swap Button */}
@@ -561,7 +518,7 @@ export default function Home({ onNavigate }) {
 
         {/* Right Side: Output Panel */}
         <motion.div variants={panelVariants} className="flex-1 flex w-full">
-          <TiltCard glowColor="from-glowing-purple/15 to-transparent" className="w-full hover:border-glowing-purple/30 shadow-2xl transition-all duration-300">
+          <GlassCard glowColor="from-glowing-purple/15 to-transparent" className="w-full hover:border-glowing-purple/30 shadow-2xl transition-all duration-300">
             
             {/* Header */}
             <div className="relative z-10 px-6 py-4 border-b border-white/10 bg-space-900/50 flex justify-between items-center backdrop-blur-md">
@@ -670,7 +627,7 @@ export default function Home({ onNavigate }) {
 
               {ttsError && <p className="text-xs text-red-400 mt-2">{ttsError}</p>}
             </div>
-          </TiltCard>
+          </GlassCard>
         </motion.div>
       </div>
 

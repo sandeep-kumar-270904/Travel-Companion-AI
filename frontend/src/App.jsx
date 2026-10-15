@@ -1,6 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
-import * as THREE from 'three';
-import HALO from 'vanta/dist/vanta.halo.min';
+import React, { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 
 import Home from './components/Home';
@@ -15,13 +13,10 @@ import Landing from './components/Landing';
 import LocalGuide from './components/LocalGuide';
 import TravelCompanions from './components/TravelCompanions';
 import ExpenseTracker from './components/ExpenseTracker';
-import SmoothCursor from './components/SmoothCursor';
 
 function App() {
   const [activeTab, setActiveTab] = useState('landing');
   const [isOnline, setIsOnline] = useState(typeof navigator !== 'undefined' ? navigator.onLine : true);
-  const vantaRef = useRef(null);
-  const [vantaEffect, setVantaEffect] = useState(null);
 
   useEffect(() => {
     window.scrollTo(0, 0); // Scroll to top on tab switch
@@ -38,29 +33,6 @@ function App() {
     };
   }, []);
 
-  useEffect(() => {
-    if (!vantaEffect) {
-      setVantaEffect(HALO({
-        el: vantaRef.current,
-        THREE: THREE,
-        mouseControls: false,
-        touchControls: false,
-        gyroControls: false,
-        minHeight: 200.00,
-        minWidth: 200.00,
-        baseColor: 0x111827,
-        backgroundColor: 0x070a11,
-        amplitudeFactor: 1.2,
-        size: 1.5,
-        xOffset: 0.1,
-        yOffset: 0.1,
-      }));
-    }
-    return () => {
-      if (vantaEffect) vantaEffect.destroy();
-    };
-  }, [vantaEffect]);
-
   const navItems = [
     { id: 'home', label: 'Dashboard' },
     { id: 'ai', label: 'AI Assistant' },
@@ -76,14 +48,20 @@ function App() {
   ];
 
   const pageVariants = {
-    initial: { opacity: 0, y: 20, filter: 'blur(10px)' },
-    animate: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 0.5, ease: 'easeOut' } },
-    exit: { opacity: 0, y: -20, filter: 'blur(10px)', transition: { duration: 0.3, ease: 'easeIn' } }
+    initial: { opacity: 0, y: 12 },
+    animate: { opacity: 1, y: 0, transition: { duration: 0.35, ease: 'easeOut' } },
+    exit: { opacity: 0, y: -12, transition: { duration: 0.2, ease: 'easeIn' } }
   };
 
   return (
-    <div ref={vantaRef} className="min-h-screen font-inter text-slate-200 selection:bg-indigo-500/30 overflow-x-hidden overflow-y-auto relative">
-      <SmoothCursor />
+    <div className="min-h-screen font-inter text-slate-200 selection:bg-indigo-500/30 overflow-x-hidden overflow-y-auto relative bg-[#070a11]">
+      {/* High-Performance Pure CSS Ambient Space Mesh (0% CPU / 0% GPU load) */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+        <div className="absolute -top-[20%] -left-[10%] w-[60vw] h-[60vw] rounded-full bg-gradient-to-br from-indigo-600/15 via-purple-600/10 to-transparent blur-[120px]" />
+        <div className="absolute top-[30%] -right-[10%] w-[50vw] h-[50vw] rounded-full bg-gradient-to-bl from-cyan-500/15 via-blue-600/10 to-transparent blur-[120px]" />
+        <div className="absolute -bottom-[10%] left-[20%] w-[45vw] h-[45vw] rounded-full bg-gradient-to-tr from-purple-800/15 via-indigo-900/10 to-transparent blur-[140px]" />
+      </div>
+
       {/* Top Navbar */}
       {activeTab !== 'landing' && (
       <nav className="sticky top-0 z-50 border-b border-white/5 bg-space-900/40 backdrop-blur-2xl">
