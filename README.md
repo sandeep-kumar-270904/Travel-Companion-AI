@@ -161,7 +161,7 @@ npm install
 cd backend
 npm run dev
 
-# Terminal 2: Launch Frontend (Port 5173)
+# Terminal 2: Launch Frontend (Port 5174)
 cd frontend
 npm run dev
 ```
@@ -208,7 +208,7 @@ docker-compose down
 ```
 
 - **Frontend Container:** Multi-stage build compiled with Node 18 Alpine and served via high-performance Nginx on port `80`.
-- **Backend Container:** Lightweight Node 18 Alpine service exposed on port `5000` with internal network bridging.
+- **Backend Container:** Lightweight Node 18 Alpine service exposed on port `4000` with internal network bridging.
 
 ## 🔐 Environment Variables
 
