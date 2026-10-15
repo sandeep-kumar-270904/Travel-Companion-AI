@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 import axios from 'axios';
-import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
+import { motion, AnimatePresence, useMotionValue, useTransform, useSpring } from 'framer-motion';
 
 const LANGUAGES = [
   { code: 'en', name: 'English' },
@@ -14,23 +14,36 @@ const LANGUAGES = [
 ];
 
 const TiltCard = ({ children, className, glowColor }) => {
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
 
-  // Rotate between -5 and 5 degrees based on mouse position
-  const rotateX = useTransform(y, [-200, 200], [5, -5]);
-  const rotateY = useTransform(x, [-200, 200], [-5, 5]);
+  // Smooth spring physics for effortless, natural, fluid movement
+  const springX = useSpring(mouseX, { damping: 25, stiffness: 120, mass: 0.4 });
+  const springY = useSpring(mouseY, { damping: 25, stiffness: 120, mass: 0.4 });
+
+  // Rotate smoothly between -4 and 4 degrees with fluid follow-through
+  const rotateX = useTransform(springY, [-200, 200], [4, -4]);
+  const rotateY = useTransform(springX, [-200, 200], [-4, 4]);
+
+  const rectRef = useRef(null);
+
+  function handleMouseEnter(event) {
+    rectRef.current = event.currentTarget.getBoundingClientRect();
+  }
 
   function handleMouse(event) {
-    const rect = event.currentTarget.getBoundingClientRect();
-    // Calculate distance from center of the card
-    x.set(event.clientX - rect.left - rect.width / 2);
-    y.set(event.clientY - rect.top - rect.height / 2);
+    if (!rectRef.current) {
+      rectRef.current = event.currentTarget.getBoundingClientRect();
+    }
+    const rect = rectRef.current;
+    mouseX.set(event.clientX - rect.left - rect.width / 2);
+    mouseY.set(event.clientY - rect.top - rect.height / 2);
   }
 
   function handleMouseLeave() {
-    x.set(0);
-    y.set(0);
+    rectRef.current = null;
+    mouseX.set(0);
+    mouseY.set(0);
   }
 
   return (
@@ -40,10 +53,10 @@ const TiltCard = ({ children, className, glowColor }) => {
     >
       <motion.div
         style={{ rotateX, rotateY }}
+        onMouseEnter={handleMouseEnter}
         onMouseMove={handleMouse}
         onMouseLeave={handleMouseLeave}
-        transition={{ type: 'spring', stiffness: 300, damping: 30, mass: 0.5 }}
-        className="w-full h-full flex flex-col glass-panel rounded-3xl overflow-hidden relative border border-white/10 transition-shadow duration-300"
+        className="w-full h-full flex flex-col glass-panel rounded-3xl overflow-hidden relative border border-white/10 transition-shadow duration-300 smooth-tilt"
       >
         <div className={`absolute inset-0 bg-gradient-to-br ${glowColor} opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`} />
         {children}
@@ -185,6 +198,7 @@ export default function Home({ onNavigate }) {
             key={idx}
             whileHover={{ y: -5, scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
+            transition={{ type: "spring", stiffness: 400, damping: 25 }}
             onClick={() => onNavigate && onNavigate(item.tab)}
             className={`p-4 rounded-3xl bg-gradient-to-br ${item.color} border border-white/10 ${item.border} text-left transition-all shadow-xl backdrop-blur-xl group cursor-pointer relative overflow-hidden`}
           >

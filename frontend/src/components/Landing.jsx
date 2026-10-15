@@ -112,17 +112,33 @@ const featuresData = [
   }
 ];
 
+const cardVariants = {
+  hidden: { opacity: 0, y: 40 },
+  visible: (customDelay) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, delay: customDelay, ease: "easeOut" }
+  }),
+  hover: {
+    y: -8,
+    scale: 1.02,
+    transition: { type: "spring", stiffness: 350, damping: 22 }
+  }
+};
+
 const FeatureCard = ({ feature, delay, isExpanded, onToggle }) => {
   return (
     <motion.div
       layout
-      initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      custom={isExpanded ? 0 : delay}
+      variants={cardVariants}
+      initial="hidden"
+      whileInView="visible"
       viewport={{ once: true, margin: "-100px" }}
-      whileHover={isExpanded ? {} : { y: -8, scale: 1.02 }}
-      transition={{ layout: { type: "spring", stiffness: 300, damping: 30 }, duration: 0.5, delay: isExpanded ? 0 : delay, ease: "easeOut" }}
+      whileHover={isExpanded ? undefined : "hover"}
+      whileTap={{ scale: 0.99 }}
       onClick={onToggle}
-      className={`group relative bg-white/[0.03] backdrop-blur-3xl border border-white/5 p-8 sm:p-10 rounded-[2rem] transition-all duration-500 overflow-hidden cursor-pointer ${isExpanded ? 'bg-white/[0.08] shadow-2xl ' + feature.glowClass : 'hover:bg-white/[0.06] ' + feature.glowClass}`}
+      className={`group relative bg-white/[0.03] backdrop-blur-3xl border border-white/5 p-8 sm:p-10 rounded-[2rem] transition-colors duration-300 overflow-hidden cursor-pointer ${isExpanded ? 'bg-white/[0.08] shadow-2xl ' + feature.glowClass : 'hover:bg-white/[0.06] ' + feature.glowClass}`}
     >
       <div className={`absolute top-0 left-10 right-10 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent transition-opacity duration-500 ${isExpanded ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} />
       

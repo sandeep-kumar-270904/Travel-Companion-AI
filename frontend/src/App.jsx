@@ -15,6 +15,7 @@ import Landing from './components/Landing';
 import LocalGuide from './components/LocalGuide';
 import TravelCompanions from './components/TravelCompanions';
 import ExpenseTracker from './components/ExpenseTracker';
+import SmoothCursor from './components/SmoothCursor';
 
 function App() {
   const [activeTab, setActiveTab] = useState('landing');
@@ -42,14 +43,14 @@ function App() {
       setVantaEffect(HALO({
         el: vantaRef.current,
         THREE: THREE,
-        mouseControls: true,
-        touchControls: true,
+        mouseControls: false,
+        touchControls: false,
         gyroControls: false,
         minHeight: 200.00,
         minWidth: 200.00,
         baseColor: 0x111827,
         backgroundColor: 0x070a11,
-        amplitudeFactor: 1.5,
+        amplitudeFactor: 1.2,
         size: 1.5,
         xOffset: 0.1,
         yOffset: 0.1,
@@ -82,6 +83,7 @@ function App() {
 
   return (
     <div ref={vantaRef} className="min-h-screen font-inter text-slate-200 selection:bg-indigo-500/30 overflow-x-hidden overflow-y-auto relative">
+      <SmoothCursor />
       {/* Top Navbar */}
       {activeTab !== 'landing' && (
       <nav className="sticky top-0 z-50 border-b border-white/5 bg-space-900/40 backdrop-blur-2xl">
