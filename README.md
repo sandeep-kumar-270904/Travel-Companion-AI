@@ -41,6 +41,9 @@ Travel Companion AI integrates critical travel utilities into a singular, respon
 - 📇 **Bilingual Chef Allergy Pass:** Generates emergency-grade medical notices in local scripts (Japanese, Thai, Vietnamese, Korean, etc.) with phonetic pronunciation guides and cross-contamination warnings.
 - 🧾 **Foreign Receipt Scanner & Expense Ledger:** OCR receipt extraction, auto-conversion to preferred home currency, and SQLite expense tracking with category breakdowns and CSV export.
 - 🚨 **Tourist Scam Radar & Emergency SOS:** Curated scam defense intelligence for global tourist hubs (Rome, Paris, Bangkok, Tokyo) plus dial-ready emergency police/ambulance numbers and embassy coordinates.
+- 🎒 **Smart Weather-Aware Packing Assistant:** Forecast-driven packing lists with country-specific electrical standards (Types A-O plugs, voltage, frequency) and local cultural dress code advice.
+- 🪙 **Global Tipping Guide & Currency Bill Splitter:** Comprehensive etiquette guidelines across 20+ countries, native phonetic bill request phrases with speech synthesis, and real-time converted bill splitting.
+- 🛡️ **Offline Emergency Document Vault:** On-device client-encrypted storage for Passports, Visas, and Flight PNRs, featuring Privacy Shield mode, a "Show Hotel to Driver" native script modal, and 1-tap SOS cards.
 - 💬 **Travel Companion Matchmaking:** SQLite-backed social matchmaking system featuring AI-simulated companion conversations.
 - 📶 **Offline-First PWA Reliability:** Real-time network status monitoring and local vault caching ensuring saved itineraries, emergency cards, and currency data work underground or in airplane mode.
 
