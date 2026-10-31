@@ -1,4 +1,5 @@
 import { CITY_SCAMS_DATABASE, EMERGENCY_NUMBERS_DATABASE } from '../data/scamsData.js';
+import { TIPPING_DATABASE } from '../data/tippingData.js';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const getGenAI = (userApiKey) => {
@@ -97,5 +98,48 @@ export const getEmergency = (req, res) => {
     success: true,
     data: match,
     availableCountries: Object.keys(EMERGENCY_NUMBERS_DATABASE)
+  });
+};
+
+
+export const getTippingGuide = (req, res) => {
+  const { country = 'japan' } = req.query;
+  const normalized = country.toLowerCase().trim().replace(/\s+/g, '_');
+
+  let match = TIPPING_DATABASE[normalized];
+  if (!match) {
+    for (const key of Object.keys(TIPPING_DATABASE)) {
+      if (normalized.includes(key) || key.includes(normalized)) {
+        match = TIPPING_DATABASE[key];
+        break;
+      }
+    }
+  }
+
+  if (!match) {
+    match = {
+      country,
+      culture: "discretionary",
+      statusBadge: "🪙 Discretionary (5% - 10%)",
+      overview: `In ${country}, tipping is generally discretionary. Rounding up bills or leaving 5% to 10% for attentive table service is customary.`,
+      restaurants: "5% to 10% for sit-down dinner service if service was satisfactory.",
+      cafes: "Round up small change.",
+      taxis: "Round up to the nearest convenient denomination.",
+      hotels: "Small tip for luggage assistance.",
+      bars: "Round up small change.",
+      culturalCaveat: "Always check your bill to see if a service charge has already been included.",
+      billPhrase: "Check, please",
+      billPronunciation: "check please",
+      billNative: "Check, please"
+    };
+  }
+
+  res.json({
+    success: true,
+    data: match,
+    availableCountries: Object.keys(TIPPING_DATABASE).map(k => ({
+      id: k,
+      name: TIPPING_DATABASE[k].country
+    }))
   });
 };

@@ -1,5 +1,5 @@
 import express from 'express';
-import { travelAdvice, checkAllergies, analyzeText, generateItinerary, chatCompanion, analyzeMenu } from '../controllers/ai.controller.js';
+import { travelAdvice, checkAllergies, analyzeText, generateItinerary, chatCompanion, analyzeMenu, generatePackingList } from '../controllers/ai.controller.js';
 
 const router = express.Router();
 
@@ -9,5 +9,6 @@ router.post('/analyze-text', analyzeText);
 router.post('/analyze-menu', analyzeMenu);
 router.post('/itinerary', generateItinerary);
 router.post('/companion-chat', chatCompanion);
+router.post('/packing-list', generatePackingList);
 
 export default router;

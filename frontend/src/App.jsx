@@ -13,6 +13,9 @@ import Landing from './components/Landing';
 import LocalGuide from './components/LocalGuide';
 import TravelCompanions from './components/TravelCompanions';
 import ExpenseTracker from './components/ExpenseTracker';
+import PackingAssistant from './components/PackingAssistant';
+import TippingGuide from './components/TippingGuide';
+import DocumentVault from './components/DocumentVault';
 
 function App() {
   const [activeTab, setActiveTab] = useState('landing');
@@ -35,6 +38,9 @@ function App() {
 
   const navItems = [
     { id: 'home', label: 'Dashboard' },
+    { id: 'packing', label: 'Smart Packing' },
+    { id: 'tipping', label: 'Tipping & Etiquette' },
+    { id: 'vault', label: 'Doc Vault' },
     { id: 'ai', label: 'AI Assistant' },
     { id: 'expenses', label: 'Expenses' },
     { id: 'localguide', label: 'Local Guide' },
@@ -81,7 +87,7 @@ function App() {
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`relative inline-flex items-center px-3.5 py-1.5 text-xs sm:text-sm font-medium transition-all duration-300 rounded-xl whitespace-nowrap ${
+                    className={`relative inline-flex items-center px-3.5 py-1.5 text-xs sm:text-sm font-medium transition-all duration-300 rounded-xl whitespace-nowrap cursor-pointer ${
                       activeTab === tab.id
                         ? 'text-white bg-white/10 shadow-glass-inset'
                         : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
@@ -123,7 +129,7 @@ function App() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`whitespace-nowrap px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                className={`whitespace-nowrap px-4 py-2.5 rounded-xl text-sm font-medium transition-all cursor-pointer ${
                   activeTab === tab.id
                     ? 'bg-gradient-to-r from-neon-cyan/20 to-blue-500/20 text-neon-cyan border border-neon-cyan/30 shadow-glow-cyan'
                     : 'text-slate-400 hover:bg-white/5 hover:text-slate-200 border border-transparent'
@@ -150,7 +156,10 @@ function App() {
           >
             {activeTab === 'landing' && <Landing onEnter={() => setActiveTab('home')} />}
             {activeTab === 'home' && <Home onNavigate={setActiveTab} />}
-            {activeTab === 'ai' && <AIAssistant />}
+            {activeTab === 'packing' && <PackingAssistant />}
+            {activeTab === 'tipping' && <TippingGuide />}
+            {activeTab === 'vault' && <DocumentVault />}
+            {activeTab === 'ai' && <AIAssistant onNavigate={setActiveTab} />}
             {activeTab === 'expenses' && <ExpenseTracker />}
             {activeTab === 'voice' && <VoiceTranslator />}
             {activeTab === 'camera' && <ARTranslator />}

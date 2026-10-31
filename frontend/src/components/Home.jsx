@@ -298,9 +298,13 @@ export default function Home({ onNavigate }) {
       <motion.div variants={panelVariants} className="mb-8 grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
         {[
           { label: 'Smart Itinerary', sub: 'Weather + .ICS Sync', badge: '⛅ Open-Meteo', icon: '🌦️', tab: 'localguide', color: 'from-purple-500/20 via-space-900 to-space-900', border: 'hover:border-purple-500/50', text: 'text-purple-300' },
+          { label: 'Smart Packing', sub: 'Weather & Plugs', badge: '🧳 Pack Checklist', icon: '🧳', tab: 'packing', color: 'from-teal-500/20 via-space-900 to-space-900', border: 'hover:border-teal-500/50', text: 'text-teal-300' },
+          { label: 'Tipping & Split', sub: 'Culture & Calculator', badge: '🍽️ Bill Etiquette', icon: '🪙', tab: 'tipping', color: 'from-amber-500/20 via-space-900 to-space-900', border: 'hover:border-amber-500/50', text: 'text-amber-300' },
+          { label: 'Document Vault', sub: 'Offline IDs & Hotels', badge: '🛡️ Privacy Shield', icon: '🛂', tab: 'vault', color: 'from-blue-500/20 via-space-900 to-space-900', border: 'hover:border-blue-500/50', text: 'text-blue-300' },
           { label: 'Chef Allergy Pass', sub: '12-Lang Emergency', badge: '📇 12 Scripts', icon: '📇', tab: 'ai', color: 'from-rose-500/20 via-space-900 to-space-900', border: 'hover:border-rose-500/50', text: 'text-rose-300' },
           { label: 'Receipt Ledger', sub: 'Multi-Currency OCR', badge: '💳 Multi-Currency', icon: '🧾', tab: 'expenses', color: 'from-emerald-500/20 via-space-900 to-space-900', border: 'hover:border-emerald-500/50', text: 'text-emerald-300' },
-          { label: 'Scam Radar & SOS', sub: 'Tourist Trap Defense', badge: '🚨 Shield Active', icon: '🚨', tab: 'emergency', color: 'from-amber-500/20 via-space-900 to-space-900', border: 'hover:border-amber-500/50', text: 'text-amber-300' }
+          { label: 'Scam Radar & SOS', sub: 'Tourist Trap Defense', badge: '🚨 Shield Active', icon: '🚨', tab: 'emergency', color: 'from-red-500/20 via-space-900 to-space-900', border: 'hover:border-red-500/50', text: 'text-red-300' },
+          { label: 'Travel Buddies', sub: 'Meet Local Explorers', badge: '👥 AI Companion', icon: '👥', tab: 'companions', color: 'from-indigo-500/20 via-space-900 to-space-900', border: 'hover:border-indigo-500/50', text: 'text-indigo-300' }
         ].map((item, idx) => (
           <motion.button
             key={idx}

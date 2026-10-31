@@ -72,6 +72,7 @@ export const analyzeForeignText = async (text, context, userApiKey) => {
 };
 
 import axios from 'axios';
+import { ELECTRICAL_STANDARDS_DATABASE } from '../data/travelStandardsData.js';
 
 const WMO_CODE_MAP = {
   0: { label: "Sunny", icon: "☀️" },
@@ -244,5 +245,178 @@ ${companionProfile.name}:`;
     console.error('Gemini API Error:', error);
     if (error.message.includes('503')) return error.message;
     throw new Error('Failed to chat with companion');
+  }
+};
+
+
+export const generateSmartPackingList = async (destination, durationDays = 5, tripType = 'leisure', userApiKey) => {
+  try {
+    const weatherData = await fetchDestinationWeather(destination);
+    
+    // Match destination to electrical standards
+    const destLower = destination.toLowerCase();
+    let electricalInfo = null;
+    for (const key of Object.keys(ELECTRICAL_STANDARDS_DATABASE)) {
+      if (destLower.includes(key.replace('_', ' ')) || (weatherData?.country && weatherData.country.toLowerCase().includes(key.replace('_', ' ')))) {
+        electricalInfo = ELECTRICAL_STANDARDS_DATABASE[key];
+        break;
+      }
+    }
+    if (!electricalInfo) {
+      electricalInfo = {
+        country: destination,
+        plugTypes: ["Universal / Type C or A"],
+        voltage: "100V - 240V",
+        frequency: "50/60Hz",
+        details: "Universal multi-country plug adapter recommended.",
+        culturalDressCode: "Pack breathable layers and respectful modest clothing for historical sites."
+      };
+    }
+
+    const avgMaxTemp = weatherData?.forecast?.length
+      ? Math.round(weatherData.forecast.reduce((a, c) => a + c.maxTemp, 0) / weatherData.forecast.length)
+      : 22;
+    const maxRainProb = weatherData?.forecast?.length
+      ? Math.max(...weatherData.forecast.map(f => f.rainProb))
+      : 20;
+
+    const genAI = getGenAI(userApiKey);
+    if (genAI) {
+      const prompt = `Create an intelligent, categorized packing checklist for a ${durationDays}-day ${tripType} trip to ${destination}.
+Weather Forecast: Avg High: ${avgMaxTemp}°C, Max Rain Chance: ${maxRainProb}%.
+Electrical Info: Plugs ${electricalInfo.plugTypes.join(', ')}, ${electricalInfo.voltage}.
+Cultural Notes: ${electricalInfo.culturalDressCode}.
+
+Return ONLY a valid JSON object matching this schema:
+{
+  "categories": [
+    {
+      "name": "Category Name (e.g. 🛂 Documents & Money, 🔌 Electronics & Adapters, 👕 Weather-Smart Clothing, 💊 Meds & Toiletries, 🎒 Daily Transit Bag)",
+      "items": [
+        {
+          "name": "Item Name",
+          "quantity": "e.g. 1, 5 pairs, etc.",
+          "essential": true,
+          "tip": "Short contextual reason"
+        }
+      ]
+    }
+  ],
+  "specialRecommendations": [
+    "Specific tip 1 based on local weather/rules",
+    "Specific tip 2"
+  ]
+}
+Return ONLY raw JSON, no markdown codeblocks, no explanation.`;
+
+      const raw = await executeWithFallback(genAI, prompt);
+      let cleaned = raw.trim();
+      if (cleaned.startsWith('```json')) cleaned = cleaned.replace(/```json/g, '').replace(/```/g, '').trim();
+      if (cleaned.startsWith('```')) cleaned = cleaned.replace(/```/g, '').trim();
+      const parsed = JSON.parse(cleaned);
+      return {
+        success: true,
+        destination,
+        durationDays,
+        tripType,
+        weather: weatherData?.forecast || [],
+        electrical: electricalInfo,
+        categories: parsed.categories || [],
+        specialRecommendations: parsed.specialRecommendations || []
+      };
+    }
+
+    // Curated Intelligent Fallback Generator
+    const clothingItems = [
+      { name: "Underwear & Base Socks", quantity: `${Number(durationDays) + 2} pairs`, essential: true, tip: "Quick-dry or merino wool" },
+      { name: "Breathable Tops / Shirts", quantity: `${durationDays} shirts`, essential: true, tip: "Layerable fabrics" },
+      { name: "Comfortable Walking Shoes", quantity: "1 pair (broken in)", essential: true, tip: "Crucial for cobblestones & 15k+ daily steps" },
+      { name: "Pants / Trousers / Bottoms", quantity: `${Math.min(4, Math.ceil(durationDays / 2))} pairs`, essential: true, tip: "Include 1 conservative pair covering knees for temples/churches" }
+    ];
+
+    if (maxRainProb > 30) {
+      clothingItems.push({ name: "Windproof Compact Umbrella / Rain Shell", quantity: "1", essential: true, tip: `Weather alert: ${maxRainProb}% rain probability forecast` });
+    }
+    if (avgMaxTemp < 15) {
+      clothingItems.push(
+        { name: "Insulated Jacket or Packable Down", quantity: "1", essential: true, tip: `Chilly weather: highs around ${avgMaxTemp}°C` },
+        { name: "Warm Scarf & Beanie", quantity: "1 set", essential: false, tip: "Evening chill protection" }
+      );
+    } else if (avgMaxTemp > 25) {
+      clothingItems.push(
+        { name: "UV Sunglasses & Sun Hat", quantity: "1 each", essential: true, tip: `Warm weather: highs around ${avgMaxTemp}°C` },
+        { name: "High-SPF Sunscreen (TSA travel size)", quantity: "1", essential: true, tip: "Carry in daypack" }
+      );
+    }
+
+    if (tripType === 'business') {
+      clothingItems.push(
+        { name: "Business Suit / Blazer", quantity: "1-2", essential: true, tip: "Wrinkle-resistant fabric" },
+        { name: "Formal Dress Shoes", quantity: "1 pair", essential: true, tip: "Polished and comfortable" }
+      );
+    } else if (tripType === 'hiking') {
+      clothingItems.push(
+        { name: "Sturdy Trail Shoes / Hiking Boots", quantity: "1 pair", essential: true, tip: "High-traction grip" },
+        { name: "Hydration Flask / Water Bladder", quantity: "1", essential: true, tip: "Stay hydrated on trails" }
+      );
+    }
+
+    return {
+      success: true,
+      destination,
+      durationDays,
+      tripType,
+      weather: weatherData?.forecast || [],
+      electrical: electricalInfo,
+      categories: [
+        {
+          name: "🛂 Documents, Money & Entry",
+          items: [
+            { name: "Passport (valid 6+ months past return)", quantity: "1", essential: true, tip: "Keep physical and digital photo backup" },
+            { name: "Travel Insurance Policy Card", quantity: "1", essential: true, tip: "24/7 medical hotline saved" },
+            { name: "Credit/Debit Cards (No Foreign Tx Fee)", quantity: "2 cards", essential: true, tip: "Inform bank of international dates" },
+            { name: "Local Cash Currency", quantity: "$100-$200 equivalent", essential: true, tip: "Small bills for street vendors and taxis" },
+            { name: "Flight & Hotel Confirmation PDFs", quantity: "Offline copies", essential: true, tip: "Saved in Document Vault" }
+          ]
+        },
+        {
+          name: "🔌 Electronics & Power Adapters",
+          items: [
+            { name: `Travel Plug Adapter (${electricalInfo.plugTypes.join(' / ')})`, quantity: "1-2", essential: true, tip: `${destination} uses ${electricalInfo.voltage} sockets` },
+            { name: "High-Capacity Power Bank (10,000–20,000 mAh)", quantity: "1 (Carry-on only)", essential: true, tip: "Navigation and camera drain phone quickly" },
+            { name: "Phone Charging Cables (Durable Braided)", quantity: "2 cables", essential: true, tip: "Keep 1 in hotel, 1 in daypack" },
+            { name: "Noise-Cancelling Headphones / Earplugs", quantity: "1", essential: false, tip: "Vital for flights, trains, and noisy hostels" }
+          ]
+        },
+        {
+          name: "👕 Weather-Smart Clothing",
+          items: clothingItems
+        },
+        {
+          name: "💊 Health, Toiletries & First-Aid",
+          items: [
+            { name: "Prescription Medications (in original bottles)", quantity: "Trip duration + 3 days", essential: true, tip: "Keep in carry-on bag, never checked" },
+            { name: "Travel First-Aid Kit (Pain relief, Band-Aids, Anti-diarrheal)", quantity: "1 small pouch", essential: true, tip: "Hard to buy specific brands in foreign pharmacies" },
+            { name: "Electrolyte Hydration Packets", quantity: "3-5 packs", essential: false, tip: "Recovery from flights and long walking days" },
+            { name: "Travel-size Toothbrush & Solid Toiletries", quantity: "1 kit", essential: true, tip: "Compliant with 100ml / 3-1-1 liquids rule" }
+          ]
+        },
+        {
+          name: "🎒 Daypack & Transit Gear",
+          items: [
+            { name: "Packable Lightweight Daypack (15-20L)", quantity: "1", essential: true, tip: "Holds water, jacket, and souvenir purchases" },
+            { name: "RFID-Blocking Neck Pouch or Money Belt", quantity: "1", essential: false, tip: "Deters crowded transit pickpockets" },
+            { name: "Wet Wipes & Pocket Tissues", quantity: "2 travel packs", essential: true, tip: "Public restrooms often lack napkins" }
+          ]
+        }
+      ],
+      specialRecommendations: [
+        `Cultural Etiquette: ${electricalInfo.culturalDressCode}`,
+        `Electrical Notice: Outlets in ${destination} are ${electricalInfo.voltage}. Dual-voltage chargers work without a transformer.`
+      ]
+    };
+  } catch (error) {
+    console.error('Packing checklist error:', error);
+    throw new Error('Failed to generate packing checklist');
   }
 };

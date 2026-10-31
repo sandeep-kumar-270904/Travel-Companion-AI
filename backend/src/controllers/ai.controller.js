@@ -71,3 +71,17 @@ export const chatCompanion = async (req, res, next) => {
     next(error);
   }
 };
+
+
+export const generatePackingList = async (req, res, next) => {
+  try {
+    const { destination, days = 5, tripType = 'leisure', apiKey } = req.body;
+    if (!destination) {
+      return res.status(400).json({ error: 'Destination is required' });
+    }
+    const result = await aiService.generateSmartPackingList(destination, days, tripType, apiKey);
+    res.json(result);
+  } catch (error) {
+    next(error);
+  }
+};
